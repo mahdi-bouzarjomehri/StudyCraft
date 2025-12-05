@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>فریم کردن مسئله</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-elevated: #ffffff;
+      --bg-soft: #eef1f5;
+      --text: #111111;
+      --muted: #555555;
+      --border: #dde1e7;
+      --accent: #4b7bec;
+      --accent-soft: rgba(75, 123, 236, 0.08);
+      --accent-strong: #2d5dd0;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.07);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --transition-fast: 0.18s ease-out;
+    }
+
+    body.dark {
+      --bg: #050816;
+      --bg-elevated: #050816;
+      --bg-soft: #0b1020;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --accent: #60a5fa;
+      --accent-soft: rgba(96, 165, 250, 0.12);
+      --accent-strong: #3b82f6;
+      --shadow-soft: 0 22px 55px rgba(0, 0, 0, 0.7);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #ffffff 0, var(--bg) 55%);
+      color: var(--text);
+      transition: background 0.6s ease, color 0.3s ease;
+    }
+
+    body.dark {
+      background: radial-gradient(circle at top, #111827 0, #020617 60%);
+    }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-soft);
+      padding: 4px 6px 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .theme-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .theme-switch {
+      width: 40px;
+      height: 20px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      position: relative;
+      transition: background var(--transition-fast);
+    }
+
+    body.dark .theme-switch {
+      background: #111827;
+    }
+
+    .theme-knob {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.25);
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      transition: transform var(--transition-fast);
+    }
+
+    body.dark .theme-knob {
+      transform: translateX(-20px);
+      background: #f9fafb;
+    }
+
+    .hero {
+      padding: 20px 18px 22px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(
+          135deg,
+          rgba(75, 123, 236, 0.12),
+          rgba(236, 72, 153, 0.06)
+        ),
+        var(--bg-elevated);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark .hero {
+      background: radial-gradient(circle at top, #1d2438 0, #020617 55%);
+      border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset-inline-end: -40px;
+      inset-block-start: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    body.dark .hero::before {
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent);
+      opacity: 0.6;
+    }
+
+    .hero-tagline {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent-strong);
+      background: rgba(255, 255, 255, 0.85);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      position: relative;
+      z-index: 1;
+    }
+
+    body.dark .hero-tagline {
+      background: rgba(15, 23, 42, 0.85);
+      border-color: rgba(75, 85, 99, 0.7);
+    }
+
+    .hero-title {
+      font-size: 1.5rem;
+      margin: 4px 0 8px;
+      letter-spacing: -0.4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 34rem;
+      line-height: 1.7;
+      position: relative;
+      z-index: 1;
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 768px) {
+      .layout-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero {
+        padding: 18px 16px 20px;
+      }
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 16px 16px 18px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        border-color var(--transition-fast), background 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-soft);
+      border-color: var(--accent-soft);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .quote-box {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      background: var(--accent-soft);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      font-size: 0.88rem;
+    }
+
+    .quote-title {
+      font-weight: 600;
+      font-size: 0.78rem;
+      color: var(--accent-strong);
+      margin-bottom: 4px;
+    }
+
+    .highlight {
+      font-weight: 600;
+      color: var(--accent-strong);
+    }
+
+    .tabs {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: background var(--transition-fast), color var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--accent-strong);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    }
+
+    body.dark .tab-btn.active {
+      background: #020617;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+    }
+
+    .tab-content {
+      display: none;
+      margin-top: 4px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section-heading {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+
+    .list {
+      margin: 8px 0 0;
+      padding-right: 16px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .list li {
+      margin-bottom: 3px;
+    }
+
+    details {
+      margin-top: 8px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      padding: 8px 10px;
+      font-size: 0.86rem;
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+    }
+
+    details[open] {
+      border-color: var(--accent);
+      background: rgba(15, 23, 42, 0.02);
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summary-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .summary-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .details-body {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      color: var(--accent-strong);
+      background: var(--accent-soft);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .framework-list {
+      margin: 6px 0 0;
+      padding-right: 14px;
+      font-size: 0.86rem;
+      color: var(--muted);
+    }
+
+    .framework-list li {
+      margin-bottom: 4px;
+    }
+
+    .cta-card {
+      margin-top: 16px;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      border: 1px dashed rgba(156, 163, 175, 0.8);
+      background: linear-gradient(
+          135deg,
+          rgba(148, 163, 184, 0.08),
+          rgba(15, 23, 42, 0)
+        ),
+        var(--bg-elevated);
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .cta-title {
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    .cta-steps {
+      margin: 4px 0 0;
+      padding-right: 14px;
+      font-size: 0.86rem;
+    }
+
+    .cta-steps li {
+      margin-bottom: 3px;
+    }
+
+    .inline-code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      background: rgba(15, 23, 42, 0.06);
+      padding: 2px 5px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+
+    body.dark .inline-code {
+      background: rgba(15, 23, 42, 0.9);
+    }
+  </style>
+</head>
+<body class="light">
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="brand-title">فریم کردن مسئله</div>
+        <div class="brand-subtitle">از «ناله» تا «تعریف مسئله» در لایف و بیزینس</div>
+      </div>
+
+      <div class="theme-toggle" id="theme-toggle">
+        <span class="theme-label">حالت روز / شب</span>
+        <div class="theme-switch">
+          <div class="theme-knob"></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-tagline">مسئله‌ات را عوض کن، قبل از این‌که راه‌حلت را عوض کنی.</div>
+      <h1 class="hero-title">مشکل تو معمولاً «نبودن راه‌حل» نیست؛ «فریم اشتباه مسئله» است.</h1>
+      <p class="hero-subtitle">
+        قبل از این‌که بپرسیم «چه کار کنم؟»، باید دقیق بفهمیم «مسئله‌ام دقیقاً چیست، برای چه کسی، و تحت چه قیدهایی؟»
+        این صفحه، همین ایده را در دو حوزه زندگی شخصی و بیزینس باز می‌کند.
+      </p>
+    </section>
+
+    <div class="layout-grid">
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">فریم کردن مسئله یعنی چه؟</div>
+          <span class="badge">تعریف کوتاه و علمی</span>
+        </div>
+        <div class="card-body">
+          <p>
+            در ادبیات تصمیم‌گیری و مدیریت، فریم‌کردن مسئله
+            یعنی تعریف و ساختاردهی آگاهانه یک وضعیت مسئله‌دار؛
+            طوری که
+            <span class="highlight">وضعیت فعلی، وضعیت مطلوب، ذی‌نفعان، محدودیت‌ها و معیارهای موفقیت</span>
+            شفاف شوند و معلوم شود چه چیز «ربط دارد» و چه چیز «ندارد».
+          </p>
+          <div class="quote-box">
+            <div class="quote-title">خلاصه کاربردی</div>
+            <p>
+              فریم خوب، مرزهای جست‌وجو برای راه‌حل را مشخص می‌کند. اگر قاب را اشتباه ببندی،
+              حتی خلاق‌ترین راه‌حل‌ها هم در زمینِ اشتباه بازی می‌کنند.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">دو لنز اصلی: لایف و بیزینس</div>
+        </div>
+        <div class="card-body">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="life">زندگی شخصی</button>
+            <button class="tab-btn" data-tab="business">بیزینس</button>
+          </div>
+
+          <div class="tab-content active" data-content="life">
+            <p class="section-heading">وقتی «ناله» را با «مسئله» اشتباه می‌گیریم</p>
+            <p>
+              جمله‌هایی مثل «وقت کم می‌آرم»، «انگیزه ندارم»، «باید بیشتر درس بخونم» احساس را تخلیه می‌کنند،
+              اما مسئله را تعریف نمی‌کنند.
+            </p>
+
+            <details>
+              <summary>
+                <div class="summary-line">
+                  <span>مثال: «چطور بیشتر درس بخوانم؟»</span>
+                  <span class="summary-label">مشاهده نسخه‌ی دقیق‌تر</span>
+                </div>
+              </summary>
+              <div class="details-body">
+                <p>
+                  فریم مبهم: «چطور بیشتر درس بخوانم؟»  
+                  در این جمله، زمان، هدف، اولویت‌ها و محدودیت‌ها گم شده‌اند.
+                </p>
+                <p>
+                  فریم بهتر:
+                  <span class="inline-code">چطور با ۲ ساعت مطالعه‌ی متمرکز در روز، نمره‌ی حداقل X بگیرم و هم‌زمان هر روز ۱ ساعت روی مهارت شغلی‌ام کار کنم، بدون اینکه خواب شبانه‌ام کمتر از ۷ ساعت شود؟</span>
+                </p>
+                <ul class="list">
+                  <li>وضعیت فعلی: زمان محدود، چند هدف هم‌زمان</li>
+                  <li>وضعیت مطلوب: نمره X + پیشرفت شغلی</li>
+                  <li>محدودیت: خواب، زمان روزانه</li>
+                  <li>معیار موفقیت: نمره و پایبندی به برنامه</li>
+                </ul>
+              </div>
+            </details>
+
+            <details>
+              <summary>
+                <div class="summary-line">
+                  <span>مثال: «وقت کم می‌آورم» و تکنیک ۵ چرا</span>
+                  <span class="summary-label">رسیدن به ریشه مسئله</span>
+                </div>
+              </summary>
+              <div class="details-body">
+                <ol class="list">
+                  <li>چرا وقت کم می‌آورم؟ چون کارهام تا آخر شب طول می‌کشه.</li>
+                  <li>چرا طول می‌کشه؟ چون وسط انجامش مدام گوشی چک می‌کنم.</li>
+                  <li>چرا گوشی چک می‌کنم؟ چون کار برام سنگین و استرس‌زاست.</li>
+                  <li>چرا استرس‌زاست؟ چون پیش‌نیازهاش رو خوب بلد نیستم.</li>
+                  <li>چرا بلد نیستم؟ چون قبلاً سرسری ردشون کردم.</li>
+                </ol>
+                <div class="grid-2">
+                  <div>
+                    <div class="pill">فریم اولیه</div>
+                    <p>مسئله‌ی من «مدیریت زمان» است.</p>
+                  </div>
+                  <div>
+                    <div class="pill">فریم نهایی</div>
+                    <p>مسئله‌ی من «ضعف در مباحث پایه و اضطراب ناشی از آن» است که باعث فرار به گوشی می‌شود.</p>
+                  </div>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <div class="tab-content" data-content="business">
+            <p class="section-heading">وقتی فریم اشتباه، هزینه‌ی واقعی می‌سازد</p>
+            <p>
+              در کسب‌وکار، خطای فریم کردن، به‌جای وقت و اعصاب، معمولاً با پول نقد تسویه می‌شود.
+            </p>
+
+            <details>
+              <summary>
+                <div class="summary-line">
+                  <span>مثال: افت فروش یک محصول آنلاین</span>
+                  <span class="summary-label">دو فریم، دو مسیر کاملاً متفاوت</span>
+                </div>
+              </summary>
+              <div class="details-body">
+                <p>
+                  داده می‌گوید: «فروش در سه ماه اخیر ۱۵٪ افت کرده است.»
+                </p>
+                <div class="grid-2">
+                  <div>
+                    <div class="pill">فریم سطحی</div>
+                    <ul class="list">
+                      <li>تعریف مسئله: «فروش کم شده.»</li>
+                      <li>نتیجه: «پس باید بازاریابی را تقویت کنیم؛ تبلیغات بیشتر!»</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <div class="pill">فریم دقیق‌تر</div>
+                    <ul class="list">
+                      <li>ترافیک سایت تقریباً ثابت است.</li>
+                      <li>نرخ تبدیل در صفحه پرداخت ۲۰٪ افت کرده.</li>
+                      <li>این اتفاق بعد از تغییر صفحه چک‌آوت رخ داده.</li>
+                    </ul>
+                  </div>
+                </div>
+                <p>
+                  بیانیه‌ی مسئله:
+                  <span class="inline-code">در سه ماه اخیر، نرخ تبدیل بازدیدکننده به خریدار در مرحله‌ی پرداخت، پس از انتشار نسخه جدید صفحه‌ی چک‌آوت، ۲۰٪ کاهش یافته و باعث افت ۱۵٪ فروش شده است. هدف ما بازگرداندن نرخ تبدیل به سطح قبلی، ظرف دو ماه، بدون افزایش بودجه تبلیغات است.</span>
+                </p>
+                <p>
+                  این‌جا مسئله دیگر «کمبود مارکتینگ» نیست؛
+                  «افت نرخ تبدیل ناشی از تجربه کاربری» است و طبیعتا فضای راه‌حل می‌شود:
+                  طراحی UX، تست A/B و تحلیل قیف فروش.
+                </p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-header">
+        <div class="card-title">چارچوب مشترک برای لایف و بیزینس</div>
+        <span class="badge">فرمول فریم کردن مسئله</span>
+      </div>
+      <div class="card-body">
+        <p>
+          تقریباً برای هر چالش، می‌توانی با چهار سؤال، یک فریم حرفه‌ای بسازی:
+        </p>
+        <ol class="framework-list">
+          <li>الان دقیقاً کجا هستم؟ (وضعیت فعلی، با داده نه فقط حس)</li>
+          <li>دقیقاً می‌خواهم به کجا برسم؟ (وضعیت مطلوب، با عدد و زمان)</li>
+          <li>شکاف بین این دو چیست و از چه جنسی است؟</li>
+          <li>چه محدودیت‌هایی دارم؟ (زمان، پول، انرژی، منابع، قوانین)</li>
+        </ol>
+        <p style="margin-top:8px;">
+          می‌توانی بیانیه مسئله‌ات را در این قالب بنویسی:
+        </p>
+        <p class="quote-box" style="margin-top:6px;">
+          <span class="quote-title">الگوی پیشنهادی</span>
+          <span class="inline-code">
+            ما با مشکلِ [توصیف دقیق وضعیت فعلی] روبه‌رو هستیم، که باعث [پیامد منفی] می‌شود. هدف ما این است که تا [زمان مشخص] به [وضعیت مطلوب قابل‌اندازه‌گیری] برسیم، با در نظر گرفتن محدودیت‌های [زمان/پول/انرژی/…].
+          </span>
+        </p>
+      </div>
+    </section>
+
+    <section class="cta-card">
+      <div class="cta-title">یک قدم کوچک، اما جدی</div>
+      <p>
+        احتمالاً همین الان هم یک چالش جدی در ذهن داری؛ شخصی یا شغلی.
+        امروز فقط این کار را انجام بده:
+      </p>
+      <ol class="cta-steps">
+        <li>همان چالش را یک‌بار به‌صورت خام بنویس (مثلاً: «مدیریت هم‌زمان درس و کار»).</li>
+        <li>بعد با چهار سؤال بالا، آن را به یک بیانیه مسئله دقیق تبدیل کن.</li>
+      </ol>
+      <p style="margin-top:6px;">
+        همین تفاوتِ بین نسخه خام و نسخه فریم‌شده، یکی از بهترین تمرین‌های عملی تفکر انتقادی است.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    // تغییر حالت روز/شب
+    const themeToggle = document.getElementById("theme-toggle");
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
+
+    // تب‌های لایف / بیزینس
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+
+        tabButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        tabContents.forEach((content) => {
+          content.classList.toggle(
+            "active",
+            content.dataset.content === target
+          );
+        });
+      });
+    });
+  </script>
+</body>
+</html>
