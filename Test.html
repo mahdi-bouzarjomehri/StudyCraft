@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>راهنمای تصمیم‌گیری ۱۰–۱۰–۱۰</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-card: #1a1a24;
+      --bg-input: #0d0d12;
+      --accent: #6366f1;
+      --accent-light: #818cf8;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-primary: #f4f4f5;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --border: rgba(255,255,255,0.08);
+      --border-active: rgba(99, 102, 241, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Vazirmatn', system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    /* Layout */
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .nav-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+      padding: 0 0.75rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.25rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-light);
+    }
+
+    .nav-item.completed {
+      color: var(--success);
+    }
+
+    .nav-item.locked {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .nav-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .nav-item.active .nav-icon {
+      background: var(--accent);
+      color: white;
+    }
+
+    .nav-item.completed .nav-icon {
+      background: var(--success);
+      color: white;
+    }
+
+    /* Main Content */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-header {
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-secondary);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-title h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .header-badge {
+      padding: 0.25rem 0.75rem;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-light);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 6px;
+      background: var(--bg-input);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #8b5cf6);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+    }
+
+    .content-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    /* Question Cards */
+    .question-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .question-number {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .question-text {
+      flex: 1;
+    }
+
+    .question-text h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .question-text p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Input Styles */
+    .input-wrapper {
+      margin-top: 1rem;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      resize: none;
+    }
+
+    .text-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .text-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Option Cards */
+    .options-grid {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: var(--bg-input);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .option-card:hover {
+      border-color: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .option-card.selected {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.08);
+    }
+
+    .option-card input {
+      display: none;
+    }
+
+    .option-indicator {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      margin-top: 2px;
+    }
+
+    .option-card.selected .option-indicator {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .option-card.selected .option-indicator::after {
+      content: "✓";
+      color: white;
+      font-size: 0.75rem;
+    }
+
+    .option-content h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .option-content p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .option-emoji {
+      font-size: 1.5rem;
+      margin-left: 0.5rem;
+    }
+
+    /* Slider */
+    .slider-wrapper {
+      padding: 1rem 0;
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .slider-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .slider-value-box {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .slider-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slider-value-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .range-slider {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-input);
+      border-radius: 999px;
+      -webkit-appearance: none;
+      border: 1px solid var(--border);
+    }
+
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 10px var(--accent-glow);
+      transition: transform 0.2s;
+    }
+
+    .range-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Chips */
+    .chips-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.85rem;
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+    }
+
+    .chip.selected {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: var(--accent);
+      color: var(--accent-light);
+    }
+
+    .chip input {
+      display: none;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: white;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+    }
+
+    /* Summary Section */
+    .summary-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: rgba(99, 102, 241, 0.1);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .summary-header h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .copy-btn {
+      padding: 0.5rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-light);
+    }
+
+    .copy-btn.copied {
+      background: var(--success);
+    }
+
+    .summary-content {
+      padding: 1.5rem;
+      font-size: 0.88rem;
+      line-height: 1.9;
+      max-height: 60vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      color: var(--text-secondary);
+    }
+
+    /* Section Divider */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Info Box */
+    .info-box {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .info-box-icon {
+      font-size: 1.25rem;
+    }
+
+    /* Step Content Visibility */
+    .step-content {
+      display: none;
+    }
+
+    .step-content.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .content {
+        padding: 1.25rem;
+      }
+
+      .question-card {
+        padding: 1.25rem;
+      }
+
+      .actions {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">۱۰³</div>
+        <div class="logo-text">راهنمای تصمیم</div>
+      </div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-title">فرایند تصمیم‌گیری</div>
+        <div class="nav-item active" data-step="0" onclick="goToStep(0)">
+          <div class="nav-icon">🎯</div>
+          <span>شروع و نوع تصمیم</span>
+        </div>
+        <div class="nav-item locked" data-step="1" onclick="goToStep(1)">
+          <div class="nav-icon">⏱️</div>
+          <span>۱۰ ثانیه: مکث</span>
+        </div>
+        <div class="nav-item locked" data-step="2" onclick="goToStep(2)">
+          <div class="nav-icon">🧠</div>
+          <span>۱۰ دقیقه: تحلیل</span>
+        </div>
+        <div class="nav-item locked" data-step="3" onclick="goToStep(3)">
+          <div class="nav-icon">🔬</div>
+          <span>۱۰ روز: عمل</span>
+        </div>
+      </div>
+      
+      <div class="nav-section">
+        <div class="nav-title">نتیجه</div>
+        <div class="nav-item locked" data-step="4" onclick="goToStep(4)">
+          <div class="nav-icon">📋</div>
+          <span>گزارش نهایی</span>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+    <header class="main-header">
+      <div class="header-title">
+        <h2 id="stepTitle">شروع فرایند</h2>
+        <span class="header-badge" id="stepBadge">گام ۱ از ۴</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="content-inner">
+        
+        <!-- Step 0: Intro -->
+        <div class="step-content active" id="step-0">
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۱</div>
+              <div class="question-text">
+                <h3>موضوع تصمیم چیست؟</h3>
+                <p>در یک جمله بنویس که می‌خواهی درباره چه چیزی تصمیم بگیری.</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <textarea class="text-input" id="decisionTopic" rows="2" placeholder="مثال: می‌خواهم تصمیم بگیرم که آیا شغلم را عوض کنم یا نه..."></textarea>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۲</div>
+              <div class="question-text">
+                <h3>این تصمیم چقدر مهم است؟</h3>
+                <p>بر اساس اهمیت، مسیر متفاوتی را طی خواهی کرد.</p>
+              </div>
+            </div>
+            <div class="options-grid">
+              <label class="option-card" onclick="selectType('small')">
+                <input type="radio" name="decisionType" value="small">
+                <div class="option-indicator"></div>
+                <div class="option-content">
+                  <h4>🟢 تصمیم کوچک و روزمره</h4>
+                  <p>قابل برگشت، کم‌هزینه، مثل خرید یا فرستادن پیام</p>
+                </div>
+              </label>
+              <label class="option-card" onclick="selectType('medium')">
+                <input type="radio" name="decisionType" value="medium">
+                <div class="option-indicator"></div>
+                <div class="option-content">
+                  <h4>🟡 تصمیم متوسط و قابل تغییر</h4>
+                  <p>نیاز به فکر دارد ولی قابل اصلاح است، مثل شروع عادت جدید</p>
+                </div>
+              </label>
+              <label class="option-card" onclick="selectType('big')">
+                <input type="radio" name="decisionType" value="big">
+                <div class="option-indicator"></div>
+                <div class="option-content">
+                  <h4>🔴 تصمیم بزرگ و سرنوشت‌ساز</h4>
+                  <p>برگشتش سخت است، مثل ازدواج، مهاجرت، استعفا</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۳</div>
+              <div class="question-text">
+                <h3>این گزارش را برای چه کسی می‌فرستی؟</h3>
+                <p>مخاطب گزارش نهایی کیست و چه انتظاری از او داری؟</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <input type="text" class="text-input" id="audience" placeholder="مثال: مشاورم، دوست صمیمی‌ام، خودم...">
+            </div>
+            <div class="input-wrapper" style="margin-top: 1rem;">
+              <textarea class="text-input" id="expectation" rows="2" placeholder="انتظارم: فقط گوش بده / پیشنهاد بده / کمکم کن تصمیم بگیرم..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 1: 10 Seconds -->
+        <div class="step-content" id="step-1">
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۱</div>
+              <div class="question-text">
+                <h3>الان دقیقاً چه احساسی داری؟</h3>
+                <p>قبل از هر چیز، احساست را شناسایی کن.</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <input type="text" class="text-input" id="currentFeeling" placeholder="مثال: نگران، هیجان‌زده، سردرگم، امیدوار...">
+            </div>
+            <div class="slider-wrapper">
+              <div class="slider-value-box">
+                <div class="slider-value" id="feelingValue">۵</div>
+                <div class="slider-value-label">شدت احساس از ۱۰</div>
+              </div>
+              <input type="range" class="range-slider" id="feelingSlider" min="1" max="10" value="5" oninput="updateSlider('feelingValue', this.value)">
+              <div class="slider-labels">
+                <span class="slider-label">خیلی کم</span>
+                <span class="slider-label">خیلی زیاد</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۲</div>
+              <div class="question-text">
+                <h3>وضعیت جسمی و روحی‌ات الان چطور است؟</h3>
+                <p>این موارد روی کیفیت تصمیم‌گیری تأثیر می‌گذارند.</p>
+              </div>
+            </div>
+            <div class="chips-group">
+              <label class="chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="گرسنه">
+                <span>🍽️ گرسنه‌ام</span>
+              </label>
+              <label class="chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="خسته">
+                <span>😴 خسته‌ام</span>
+              </label>
+              <label class="chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="استرسی">
+                <span>😰 استرس دارم</span>
+              </label>
+              <label class="chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="عصبانی">
+                <span>😤 عصبانی‌ام</span>
+              </label>
+              <label class="chip" onclick="toggleChip(this)">
+                <input type="checkbox" value="حالم خوبه">
+                <span>✨ حالم خوبه</span>
+              </label>
+            </div>
+            <div class="info-box">
+              <span class="info-box-icon">💡</span>
+              <span>اگر گرسنه، خسته یا عصبانی هستی، شاید بهتر باشد تصمیم مهم را به بعد موکول کنی.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: 10 Minutes -->
+        <div class="step-content" id="step-2">
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۱</div>
+              <div class="question-text">
+                <h3>گزینه‌های پیش رویت چیست؟</h3>
+                <p>حداکثر ۲-۳ گزینه اصلی را بنویس.</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <textarea class="text-input" id="options" rows="3" placeholder="گزینه ۱: ...&#10;گزینه ۲: ...&#10;گزینه ۳: ..."></textarea>
+            </div>
+          </div>
+
+          <div class="section-divider">⏳ نگاه زمانی ۱۰–۱۰–۱۰</div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۲</div>
+              <div class="question-text">
+                <h3>📅 ۱۰ روز بعد چه اتفاقی می‌افتد؟</h3>
+                <p>اثر کوتاه‌مدت: احساس و تغییرات اولیه</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <textarea class="text-input" id="time10days" rows="2" placeholder="۱۰ روز بعد از این تصمیم..."></textarea>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۳</div>
+              <div class="question-text">
+                <h3>📆 ۱۰ ماه بعد چه اتفاقی می‌افتد؟</h3>
+                <p>اثر میان‌مدت: روی کار، روابط و سلامتی</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <textarea class="text-input" id="time10months" rows="2" placeholder="۱۰ ماه بعد از این تصمیم..."></textarea>
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۴</div>
+              <div class="question-text">
+                <h3>🔮 ۱۰ سال بعد چه اتفاقی می‌افتد؟</h3>
+                <p>اثر بلندمدت: تصویر کلی زندگی و اهداف</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <textarea class="text-input" id="time10years" rows="2" placeholder="۱۰ سال بعد از این تصمیم..."></textarea>
+            </div>
+          </div>
+
+          <div class="section-divider">💎 ارزش‌ها و پشیمانی</div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۵</div>
+              <div class="question-text">
+                <h3>کدام ارزش‌های زندگی‌ات درگیر هستند؟</h3>
+                <p>مثل: امنیت، آزادی، خانواده، رشد، سلامتی</p>
+              </div>
+            </div>
+            <div class="input-wrapper">
+              <input type="text" class="text-input" id="values" placeholder="ارزش‌های مهم من: ...">
+            </div>
+            <div class="slider-wrapper">
+              <div class="slider-value-box">
+                <div class="slider-value" id="valuesValue">۵</div>
+                <div class="slider-value-label">هم‌خوانی با ارزش‌ها از ۱۰</div>
+              </div>
+              <input type="range" class="range-slider" id="valuesSlider" min="0" max="10" value="5" oninput="updateSlider('valuesValue', this.value)">
+            </div>
+          </div>
+
+          <div class="question-card">
+            <div class="question-header">
+              <div class="question-number">۶</div>
+              <div class="question-text">
+                <h3>از کدام بیشتر ممکن است پشیمان شوی؟</h3>
+              </div>
+            </div>
+            <div class="options-grid">
+              <label class="option-card" onclick="selectOption(this, 'regret')">
+                <input type="radio" name="regret" value="انجام دادن">
+                <div class="option-indicator"></div>
+                <div class="option-content">
+                  <h4>از انجام دادنش</h4>
+                  <p>اگر این کار را بکنم شاید پشیمان شوم</p>
+                </div>
+                <span class="option-emoji">😔</span>
+              </label>
+              <label class="option-card" onclick="selectOption(this, 'regret')">
+                <input type="radio" name="regret" value="انجام ندادن">
+                <div class="option-indicator"></div>
+                <div class="option-content">
+                  <h4>از انجام ندادنش</h4>
+                  <p>اگر این کار را نکنم شاید حسرت بخورم</p>
+                </div>
+                <span class="option-emoji">😕</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: 10 Days -->
+        <div class="step-content" id="step-3">
+          <div id="mediumSection" style="display: none;">
+            <div class="question-card">
+              <div class="question-header">
+                <div class="question-number">🧪</div>
+                <div class="question-text">
+                  <h3>آزمایش ۱۰ روزه</h3>
+                  <p>یک نسخه کوچک از این تصمیم را ۱۰ روز امتحان کن.</p>
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">چه چیزی را امتحان می‌کنی؟</label>
+                <textarea class="text-input" id="experiment" rows="2" placeholder="مثال: ۱۰ روز هر روز ۱ ساعت روی پروژه جدید کار می‌کنم..."></textarea>
+              </div>
+              <div class="input-wrapper" style="margin-top: 1rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">معیار موفقیت روز دهم چیست؟</label>
+                <input type="text" class="text-input" id="successMetric" placeholder="اگر این اتفاق افتاد، یعنی موفق بوده...">
+              </div>
+            </div>
+          </div>
+
+          <div id="bigSection" style="display: none;">
+            <div class="question-card">
+              <div class="question-header">
+                <div class="question-number">📚</div>
+                <div class="question-text">
+                  <h3>تعویق فعال ۱۰ روزه</h3>
+                  <p>برای تصمیم بزرگ، ۱۰ روز وقت بگذار برای تحقیق و سناریونویسی.</p>
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">🌟 بهترین سناریو (اگر همه چیز خوب پیش برود)</label>
+                <textarea class="text-input" id="bestCase" rows="2"></textarea>
+              </div>
+              <div class="input-wrapper" style="margin-top: 1rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">⚠️ بدترین سناریو (اگر همه چیز بد پیش برود)</label>
+                <textarea class="text-input" id="worstCase" rows="2"></textarea>
+              </div>
+              <div class="input-wrapper" style="margin-top: 1rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">👥 با چه کسانی مشورت می‌کنی؟</label>
+                <input type="text" class="text-input" id="consultants" placeholder="یک متخصص مرتبط و یک نفر قابل اعتماد">
+              </div>
+              <div class="input-wrapper" style="margin-top: 1rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">🗓️ چه زمانی این تصمیم را بازنگری می‌کنی؟</label>
+                <input type="text" class="text-input" id="reviewDate" placeholder="مثال: ۶ ماه دیگر">
+              </div>
+            </div>
+          </div>
+
+          <div id="smallSection" style="display: none;">
+            <div class="question-card">
+              <div class="question-header">
+                <div class="question-number">✅</div>
+                <div class="question-text">
+                  <h3>تصمیم نهایی</h3>
+                  <p>برای تصمیم کوچک، همین الان بر اساس گام‌های قبل انتخاب کن.</p>
+                </div>
+              </div>
+              <div class="input-wrapper">
+                <textarea class="text-input" id="finalDecision" rows="2" placeholder="تصمیم من این است که..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Summary -->
+        <div class="step-content" id="step-4">
+          <div class="summary-container">
+            <div class="summary-header">
+              <h3>📋 گزارش تحلیل تصمیم</h3>
+              <button class="copy-btn" id="copyBtn" onclick="copyReport()">📋 کپی گزارش</button>
+            </div>
+            <div class="summary-content" id="summaryContent"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="actions">
+      <button class="btn btn-ghost" id="prevBtn" onclick="prevStep()" style="display: none;">
+        ← قبلی
+      </button>
+      <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+        بعدی →
+      </button>
+    </footer>
+  </main>
+</div>
+
+<script>
+  // State
+  let currentStep = 0;
+  let decisionType = 'medium';
+  const totalSteps = 5;
+  
+  const stepTitles = [
+    'شروع و اطلاعات اولیه',
+    '۱۰ ثانیه: مکث و تنظیم هیجان',
+    '۱۰ دقیقه: تحلیل و نگاه زمانی',
+    '۱۰ روز: برنامه عملی',
+    'گزارش نهایی'
+  ];
+
+  // Persian numbers
+  function toPersian(n) {
+    return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  }
+
+  // Update slider value
+  function updateSlider(id, value) {
+    document.getElementById(id).textContent = toPersian(value);
+  }
+
+  // Select decision type
+  function selectType(type) {
+    decisionType = type;
+    document.querySelectorAll('#step-0 .option-card').forEach(card => {
+      card.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+    
+    // Update Step 3 visibility
+    document.getElementById('smallSection').style.display = type === 'small' ? 'block' : 'none';
+    document.getElementById('mediumSection').style.display = type === 'medium' ? 'block' : 'none';
+    document.getElementById('bigSection').style.display = type === 'big' ? 'block' : 'none';
+  }
+
+  // Select option
+  function selectOption(el, name) {
+    document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+      input.closest('.option-card').classList.remove('selected');
+    });
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+  }
+
+  // Toggle chip
+  function toggleChip(el) {
+    el.classList.toggle('selected');
+    const input = el.querySelector('input');
+    input.checked = !input.checked;
+  }
+
+  // Navigation
+  function nextStep() {
+    if (currentStep < totalSteps - 1) {
+      currentStep++;
+      updateUI();
+      
+      if (currentStep === totalSteps - 1) {
+        generateReport();
+      }
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      currentStep--;
+      updateUI();
+    }
+  }
+
+  function goToStep(step) {
+    if (step <= currentStep) {
+      currentStep = step;
+      updateUI();
+    }
+  }
+
+  function updateUI() {
+    // Update step visibility
+    document.querySelectorAll('.step-content').forEach((el, i) => {
+      el.classList.toggle('active', i === currentStep);
+    });
+
+    // Update header
+    document.getElementById('stepTitle').textContent = stepTitles[currentStep];
+    document.getElementById('stepBadge').textContent = `گام ${toPersian(currentStep + 1)} از ${toPersian(totalSteps)}`;
+    
+    // Update progress
+    const progress = ((currentStep) / (totalSteps - 1)) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+
+    // Update nav
+    document.querySelectorAll('.nav-item').forEach((item, i) => {
+      item.classList.remove('active', 'completed', 'locked');
+      if (i < currentStep) item.classList.add('completed');
+      else if (i === currentStep) item.classList.add('active');
+      else item.classList.add('locked');
+    });
+
+    // Update buttons
+    document.getElementById('prevBtn').style.display = currentStep > 0 ? 'flex' : 'none';
+    document.getElementById('nextBtn').textContent = currentStep === totalSteps - 2 ? 'مشاهده گزارش ✓' : 'بعدی →';
+    document.getElementById('nextBtn').style.display = currentStep === totalSteps - 1 ? 'none' : 'flex';
+
+    // Scroll to top
+    document.querySelector('.content').scrollTop = 0;
+  }
+
+  // Generate Report
+  function generateReport() {
+    const getValue = id => document.getElementById(id)?.value || 'وارد نشده';
+    const getCheckedChips = () => {
+      return Array.from(document.querySelectorAll('.chip.selected input'))
+        .map(i => i.value).join('، ') || 'انتخاب نشده';
+    };
+    const getRadio = name => {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : 'انتخاب نشده';
+    };
+
+    const date = new Date().toLocaleDateString('fa-IR');
+    const time = new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    
+    const typeLabel = decisionType === 'small' ? 'کوچک و روزمره 🟢' : 
+                      decisionType === 'medium' ? 'متوسط و قابل تغییر 🟡' : 'بزرگ و سرنوشت‌ساز 🔴';
+
+    let report = `╔══════════════════════════════════════════════════════════════╗
+║            📋 گزارش تصمیم‌گیری با مدل ۱۰–۱۰–۱۰              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📅 تاریخ: ${date} | 🕐 ساعت: ${time}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 درباره این گزارش
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+این گزارش با روش «۱۰–۱۰–۱۰» تهیه شده که دو لایه دارد:
+
+🔹 لایه فرایندی:
+   ۱۰ ثانیه → مکث و تنظیم هیجان
+   ۱۰ دقیقه → تحلیل و بررسی گزینه‌ها
+   ۱۰ روز → آزمایش یا تعویق فعال
+
+🔹 لایه زمانی:
+   ۱۰ روز بعد → اثر کوتاه‌مدت
+   ۱۰ ماه بعد → اثر میان‌مدت
+   ۱۰ سال بعد → اثر بلندمدت
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 اطلاعات کلی
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 موضوع تصمیم: ${getValue('decisionTopic')}
+📊 نوع تصمیم: ${typeLabel}
+👤 مخاطب گزارش: ${getValue('audience')}
+💭 انتظار از خواننده: ${getValue('expectation')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏱️ گام ۱۰ ثانیه: وضعیت آنی
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🧠 احساس فعلی: ${getValue('currentFeeling')}
+📈 شدت احساس: ${toPersian(document.getElementById('feelingSlider')?.value || 5)} از ۱۰
+🏃 وضعیت بدن: ${getCheckedChips()}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧠 گام ۱۰ دقیقه: تحلیل
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 گزینه‌ها:
+${getValue('options')}
+
+⏳ نگاه زمانی ۱۰–۱۰–۱۰:
+┌─────────────────────────────────────────────────────────────┐
+│ 📅 ۱۰ روز بعد:                                              │
+│ ${getValue('time10days')}
+├─────────────────────────────────────────────────────────────┤
+│ 📆 ۱۰ ماه بعد:                                              │
+│ ${getValue('time10months')}
+├─────────────────────────────────────────────────────────────┤
+│ 🔮 ۱۰ سال بعد:                                              │
+│ ${getValue('time10years')}
+└─────────────────────────────────────────────────────────────┘
+
+💎 ارزش‌های درگیر: ${getValue('values')}
+📊 هم‌خوانی با ارزش‌ها: ${toPersian(document.getElementById('valuesSlider')?.value || 5)} از ۱۰
+🤔 ترس از پشیمانی: ${getRadio('regret')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔬 گام ۱۰ روز: برنامه عملی
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+`;
+
+    if (decisionType === 'small') {
+      report += `
+✅ تصمیم نهایی:
+${getValue('finalDecision')}
+`;
+    } else if (decisionType === 'medium') {
+      report += `
+🧪 آزمایش ۱۰ روزه:
+${getValue('experiment')}
+
+📏 معیار موفقیت:
+${getValue('successMetric')}
+`;
+    } else {
+      report += `
+🌟 بهترین سناریو:
+${getValue('bestCase')}
+
+⚠️ بدترین سناریو:
+${getValue('worstCase')}
+
+👥 مشاوران: ${getValue('consultants')}
+🗓️ تاریخ بازنگری: ${getValue('reviewDate')}
+`;
+    }
+
+    report += `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💬 راهنما برای خواننده گزارش
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+سلام! این گزارش را برایت فرستادم چون نظرت برایم مهم است.
+
+📌 از تو می‌خواهم:
+• صادقانه نظر بده، حتی اگر مخالف باشی
+• نقاط کور را بهم بگو
+• اگر تجربه مشابهی داری، به اشتراک بذار
+• سؤال بپرس اگر چیزی نامفهوم است
+
+🔍 به این سؤالات فکر کن:
+• آیا گزینه‌ای هست که ندیده باشم؟
+• ریسکی می‌بینی که نادیده گرفتم؟
+• اگر جای من بودی چه می‌کردی؟
+
+⚠️ توجه:
+• نظر تو مشورت است، تصمیم نهایی با خودم است
+• لازم نیست فوری جواب بدهی
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ این گزارش با ابزار تصمیم‌گیری ۱۰–۱۰–۱۰ ساخته شده
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+    document.getElementById('summaryContent').textContent = report;
+  }
+
+  // Copy Report
+  function copyReport() {
+    const text = document.getElementById('summaryContent').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ کپی شد!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 کپی گزارش';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Initialize
+  updateUI();
+</script>
+
+</body>
+</html>
