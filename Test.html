@@ -1,1302 +1,2415 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>راهنمای تصمیم‌گیری ۱۰–۱۰–۱۰</title>
+  <meta charset="UTF-8" />
+  <title>ابزار تصمیم‌گیری ۱۰–۱۰–۱۰</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="ابزار تصمیم‌گیری آگاهانه با مدل ۱۰-۱۰-۱۰" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-card: #1a1a24;
-      --bg-input: #0d0d12;
+      --bg: #0a0a0f;
+      --bg-card: rgba(17, 17, 27, 0.95);
+      --bg-input: rgba(25, 25, 40, 0.8);
       --accent: #6366f1;
-      --accent-light: #818cf8;
-      --accent-glow: rgba(99, 102, 241, 0.3);
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text-primary: #f4f4f5;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
-      --border: rgba(255,255,255,0.08);
-      --border-active: rgba(99, 102, 241, 0.5);
+      --accent-soft: rgba(99, 102, 241, 0.12);
+      --accent-glow: rgba(99, 102, 241, 0.25);
+      --green: #10b981;
+      --green-soft: rgba(16, 185, 129, 0.12);
+      --orange: #f59e0b;
+      --orange-soft: rgba(245, 158, 11, 0.12);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.12);
+      --purple: #a855f7;
+      --purple-soft: rgba(168, 85, 247, 0.12);
+      --cyan: #06b6d4;
+      --cyan-soft: rgba(6, 182, 212, 0.12);
+      --text: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border: rgba(148, 163, 184, 0.12);
+      --border-hover: rgba(148, 163, 184, 0.25);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Vazirmatn', system-ui, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
       min-height: 100vh;
-      line-height: 1.7;
     }
 
-    /* Layout */
-    .app {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.15), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(168, 85, 247, 0.08), transparent);
+      pointer-events: none;
+      z-index: -1;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: 280px;
-      background: var(--bg-secondary);
-      border-left: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
+    .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
-    .sidebar-header {
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
+    header { text-align: center; padding: 2.5rem 0 2rem; }
 
     .logo {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 0.75rem;
-    }
-
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 0.9rem;
-    }
-
-    .logo-text {
-      font-weight: 700;
-      font-size: 1.1rem;
-    }
-
-    .sidebar-nav {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-    }
-
-    .nav-section {
-      margin-bottom: 1.5rem;
-    }
-
-    .nav-title {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
-      padding: 0 0.75rem;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 0.25rem;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-
-    .nav-item:hover {
-      background: rgba(255,255,255,0.05);
-      color: var(--text-primary);
-    }
-
-    .nav-item.active {
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-light);
-    }
-
-    .nav-item.completed {
-      color: var(--success);
-    }
-
-    .nav-item.locked {
-      opacity: 0.4;
-      pointer-events: none;
-    }
-
-    .nav-icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .nav-item.active .nav-icon {
-      background: var(--accent);
-      color: white;
-    }
-
-    .nav-item.completed .nav-icon {
-      background: var(--success);
-      color: white;
-    }
-
-    /* Main Content */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .main-header {
-      padding: 1.25rem 2rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--bg-secondary);
-    }
-
-    .header-title {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-title h2 {
-      font-size: 1.1rem;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 999px;
+      font-size: 0.8rem;
       font-weight: 600;
-    }
-
-    .header-badge {
-      padding: 0.25rem 0.75rem;
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--accent-light);
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    .progress-bar {
-      width: 200px;
-      height: 6px;
-      background: var(--bg-input);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), #8b5cf6);
-      border-radius: 999px;
-      transition: width 0.5s ease;
-    }
-
-    /* Content Area */
-    .content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 2rem;
-    }
-
-    .content-inner {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    /* Question Cards */
-    .question-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      margin-bottom: 1.5rem;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .question-header {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
+      color: var(--accent);
       margin-bottom: 1.25rem;
     }
 
-    .question-number {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      border-radius: 10px;
-      display: flex;
+    .logo-dot {
+      width: 8px; height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .method-badge {
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
-      font-weight: 700;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(135deg, var(--accent-soft), var(--purple-soft));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       font-size: 0.85rem;
-      flex-shrink: 0;
     }
 
-    .question-text {
-      flex: 1;
-    }
+    .method-badge strong { color: var(--accent); }
 
-    .question-text h3 {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin-bottom: 0.35rem;
-    }
-
-    .question-text p {
-      font-size: 0.85rem;
+    .disclaimer-box {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--orange-soft);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
       color: var(--text-secondary);
     }
 
-    /* Input Styles */
-    .input-wrapper {
-      margin-top: 1rem;
+    .progress-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
     }
 
-    .text-input {
-      width: 100%;
-      background: var(--bg-input);
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.9rem;
+      background: rgba(255,255,255,0.02);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      resize: none;
-    }
-
-    .text-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .text-input::placeholder {
+      border-radius: 999px;
+      font-size: 0.8rem;
       color: var(--text-muted);
+      transition: var(--transition);
     }
 
-    /* Option Cards */
-    .options-grid {
+    .progress-step .num {
+      width: 22px; height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .progress-step.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .progress-step.active .num {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .progress-step.done {
+      background: var(--green-soft);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .progress-step.done .num {
+      background: var(--green);
+      color: white;
+    }
+
+    .progress-line { width: 30px; height: 2px; background: var(--border); }
+    .progress-line.done { background: var(--green); }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+
+    .card.visible { opacity: 1; transform: translateY(0); }
+    .card.hidden { display: none; }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-icon {
+      width: 52px; height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-lg);
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .card-icon.purple { background: var(--purple-soft); border: 1px solid rgba(168, 85, 247, 0.3); }
+    .card-icon.cyan { background: var(--cyan-soft); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .card-icon.green { background: var(--green-soft); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .card-icon.orange { background: var(--orange-soft); border: 1px solid rgba(249, 115, 22, 0.3); }
+
+    .card-meta { flex: 1; }
+
+    .step-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    .info-box {
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+    }
+
+    .info-box.science {
+      background: linear-gradient(135deg, var(--purple-soft), var(--accent-soft));
+      border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .info-box.tip {
+      background: var(--cyan-soft);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+    }
+
+    .info-box.warning {
+      background: var(--orange-soft);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    .info-box.danger {
+      background: var(--red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .info-box-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-box.science .info-box-header { color: var(--purple); }
+    .info-box.tip .info-box-header { color: var(--cyan); }
+    .info-box.warning .info-box-header { color: var(--orange); }
+    .info-box.danger .info-box-header { color: var(--red); }
+
+    .info-box p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .info-box .source {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    .collapsible {
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .collapsible-btn {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .collapsible-btn span:last-child { transition: transform 0.3s; }
+    .collapsible.open .collapsible-btn span:last-child { transform: rotate(180deg); }
+
+    .collapsible-content {
+      display: none;
+      padding: 1rem;
+      background: rgba(0,0,0,0.2);
+      border-top: 1px solid var(--border);
+    }
+
+    .collapsible.open .collapsible-content { display: block; }
+
+    .example-grid {
       display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 0.75rem;
     }
 
-    .option-card {
+    .example-item {
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+    }
+
+    .example-item.bad {
+      background: var(--red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .example-item.good {
+      background: var(--green-soft);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .example-item-label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .example-item.bad .example-item-label { color: var(--red); }
+    .example-item.good .example-item-label { color: var(--green); }
+
+    .form-group { margin-bottom: 1.5rem; }
+
+    .form-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .form-hint {
+      display: block;
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      resize: vertical;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .form-input::placeholder { color: var(--text-muted); }
+    textarea.form-input { min-height: 90px; line-height: 1.7; }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .frame-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .frame-item {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .frame-item-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .frame-item-num {
+      width: 26px; height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent-soft);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .frame-item-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .adaptive-section {
+      padding: 1.25rem;
+      background: var(--purple-soft);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+    }
+
+    .adaptive-section.hidden { display: none; }
+
+    .adaptive-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .adaptive-title { font-weight: 700; color: var(--purple); }
+    .adaptive-subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+
+    .why-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .why-row:last-child { margin-bottom: 0; }
+
+    .why-num {
+      width: 22px; height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(168, 85, 247, 0.2);
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--purple);
+      flex-shrink: 0;
+    }
+
+    .why-row input {
+      flex: 1;
+      padding: 0.6rem 0.85rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .why-row input:focus { outline: none; border-color: var(--purple); }
+
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .resource-item {
+      padding: 1rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .resource-item label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .resource-item input {
+      width: 100%;
+      padding: 0.6rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .resource-item input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .decision-options { display: flex; flex-direction: column; gap: 0.85rem; }
+
+    .decision-option {
       display: flex;
       align-items: flex-start;
       gap: 1rem;
       padding: 1.25rem;
-      background: var(--bg-input);
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .option-card:hover {
-      border-color: rgba(255,255,255,0.15);
       background: rgba(255,255,255,0.02);
-    }
-
-    .option-card.selected {
-      border-color: var(--accent);
-      background: rgba(99, 102, 241, 0.08);
-    }
-
-    .option-card input {
-      display: none;
-    }
-
-    .option-indicator {
-      width: 24px;
-      height: 24px;
       border: 2px solid var(--border);
-      border-radius: 50%;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .decision-option input { display: none; }
+
+    .decision-option:hover {
+      border-color: var(--border-hover);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .decision-option.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .option-icon {
+      width: 44px; height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border-radius: var(--radius-md);
+      font-size: 1.25rem;
       flex-shrink: 0;
-      transition: all 0.2s;
-      margin-top: 2px;
     }
 
-    .option-card.selected .option-indicator {
-      border-color: var(--accent);
-      background: var(--accent);
+    .decision-option[data-type="small"] .option-icon {
+      background: var(--green-soft);
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
-    .option-card.selected .option-indicator::after {
-      content: "✓";
-      color: white;
+    .decision-option[data-type="medium"] .option-icon {
+      background: var(--orange-soft);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .decision-option[data-type="big"] .option-icon {
+      background: var(--red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .option-content { flex: 1; }
+    .option-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+
+    .option-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-steps {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      background: var(--accent-soft);
+      border-radius: 999px;
       font-size: 0.75rem;
-    }
-
-    .option-content h4 {
-      font-size: 0.95rem;
+      color: var(--accent);
       font-weight: 600;
-      margin-bottom: 0.25rem;
     }
 
-    .option-content p {
-      font-size: 0.8rem;
+    .rating-box {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .rating-numbers {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .rating-num {
+      width: 28px; height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.03);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
       color: var(--text-secondary);
     }
 
-    .option-emoji {
-      font-size: 1.5rem;
-      margin-left: 0.5rem;
+    .rating-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(to left, var(--green), var(--orange), var(--red));
+      margin: 0.5rem 0;
     }
 
-    /* Slider */
-    .slider-wrapper {
-      padding: 1rem 0;
+    .rating-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--accent);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-    .slider-labels {
+    .rating-labels {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 0.75rem;
-    }
-
-    .slider-label {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
     }
 
-    .slider-value-box {
+    .rating-display {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .rating-value {
+      padding: 0.5rem 1.25rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--accent);
+    }
+
+    .checkbox-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.9rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .checkbox-item:hover { border-color: var(--border-hover); }
+
+    .checkbox-item.checked {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+
+    .checkbox-item input { display: none; }
+
+    .checkbox-box {
+      width: 22px; height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      transition: var(--transition);
+    }
+
+    .checkbox-item.checked .checkbox-box {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    .checkbox-content { flex: 1; }
+    .checkbox-title { font-weight: 600; font-size: 0.9rem; }
+    .checkbox-desc { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+    .radio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .radio-card {
+      padding: 1.25rem 1rem;
+      background: rgba(255,255,255,0.02);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-md);
       text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .radio-card:hover { border-color: var(--border-hover); }
+
+    .radio-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .radio-card input { display: none; }
+    .radio-card-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+    .radio-card-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.35rem; }
+    .radio-card-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .column-card {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .column-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .deep-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--purple-soft), rgba(99, 102, 241, 0.05));
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: var(--radius-lg);
+    }
+
+    .deep-section.hidden { display: none; }
+
+    .deep-section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .deep-section-icon { font-size: 1.5rem; }
+    .deep-section-title { font-weight: 700; color: var(--purple); }
+    .deep-section-subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+
+    .time-box {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1.25rem;
+    }
+
+    .time-box-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .time-box-icon { font-size: 1.5rem; }
+    .time-box-title { font-weight: 700; font-size: 1rem; }
+    .time-box-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .pros-box, .cons-box {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+    }
+
+    .pros-box {
+      background: var(--green-soft);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .cons-box {
+      background: var(--red-soft);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .pros-header, .cons-header {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pros-header { color: var(--green); }
+    .cons-header { color: var(--red); }
+
+    .pros-box .form-input, .cons-box .form-input { background: rgba(0,0,0,0.2); }
+
+    .priority-section {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .priority-section.hidden { display: none; }
+
+    .priority-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .priority-item {
+      padding: 0.75rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .priority-item:hover { border-color: var(--accent); }
+    .priority-item.selected { border-color: var(--accent); background: var(--accent-soft); }
+
+    .priority-item input { display: none; }
+    .priority-label { font-size: 0.85rem; font-weight: 500; }
+
+    .commitment-box {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, var(--green-soft), var(--cyan-soft));
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: var(--radius-lg);
+    }
+
+    .commitment-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       margin-bottom: 1rem;
     }
 
-    .slider-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .commitment-title { font-weight: 700; color: var(--green); }
+    .commitment-subtitle { font-size: 0.8rem; color: var(--text-secondary); }
+
+    .commitment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
     }
 
-    .slider-value-label {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
+    .commitment-item {
+      padding: 1rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: var(--radius-md);
     }
 
-    .range-slider {
-      width: 100%;
-      height: 8px;
-      background: var(--bg-input);
-      border-radius: 999px;
-      -webkit-appearance: none;
-      border: 1px solid var(--border);
-    }
-
-    .range-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 24px;
-      height: 24px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 2px 10px var(--accent-glow);
-      transition: transform 0.2s;
-    }
-
-    .range-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-    }
-
-    /* Chips */
-    .chips-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.6rem 1rem;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.85rem;
-    }
-
-    .chip:hover {
-      border-color: var(--accent);
-    }
-
-    .chip.selected {
-      background: rgba(99, 102, 241, 0.15);
-      border-color: var(--accent);
-      color: var(--accent-light);
-    }
-
-    .chip input {
-      display: none;
-    }
-
-    /* Actions */
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1.5rem 2rem;
-      border-top: 1px solid var(--border);
-      background: var(--bg-secondary);
+    .commitment-item-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
     }
 
     .btn {
+      padding: 0.85rem 1.75rem;
+      border-radius: 999px;
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.85rem 1.75rem;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: none;
+      transition: var(--transition);
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
       color: white;
-      box-shadow: 0 4px 15px var(--accent-glow);
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px var(--accent-glow);
+      box-shadow: 0 10px 25px var(--accent-glow);
     }
 
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
-
-    .btn-ghost:hover {
+    .btn-secondary {
       background: rgba(255,255,255,0.05);
-      color: var(--text-primary);
+      border: 1px solid var(--border);
+      color: var(--text);
     }
 
-    /* Summary Section */
+    .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--green), #059669);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
     .summary-container {
-      background: var(--bg-card);
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.3);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
+      border-radius: var(--radius-lg);
     }
 
     .summary-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.25rem 1.5rem;
-      background: rgba(99, 102, 241, 0.1);
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
-    }
-
-    .summary-header h3 {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 1rem;
-    }
-
-    .copy-btn {
-      padding: 0.5rem 1rem;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .copy-btn:hover {
-      background: var(--accent-light);
-    }
-
-    .copy-btn.copied {
-      background: var(--success);
-    }
-
-    .summary-content {
-      padding: 1.5rem;
-      font-size: 0.88rem;
-      line-height: 1.9;
-      max-height: 60vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      color: var(--text-secondary);
-    }
-
-    /* Section Divider */
-    .section-divider {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 2rem 0;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-    }
-
-    .section-divider::before,
-    .section-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    /* Info Box */
-    .info-box {
-      background: rgba(99, 102, 241, 0.08);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      margin-top: 1rem;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      display: flex;
+      flex-wrap: wrap;
       gap: 0.75rem;
     }
 
-    .info-box-icon {
-      font-size: 1.25rem;
+    .summary-title { font-weight: 700; font-size: 1rem; }
+
+    .summary-buttons {
+      display: flex;
+      gap: 0.5rem;
     }
 
-    /* Step Content Visibility */
-    .step-content {
-      display: none;
+    .copy-btn {
+      padding: 0.6rem 1.25rem;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius-sm);
+      color: var(--accent);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: var(--transition);
     }
 
-    .step-content.active {
-      display: block;
+    .copy-btn:hover { background: var(--accent); color: white; }
+
+    .copy-btn.copied {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
     }
 
-    /* Responsive */
-    @media (max-width: 900px) {
-      .sidebar {
-        display: none;
-      }
+    .summary-content {
+      font-size: 0.85rem;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-left: 0.5rem;
     }
 
-    @media (max-width: 600px) {
-      .content {
-        padding: 1.25rem;
-      }
+    .summary-content::-webkit-scrollbar { width: 5px; }
+    .summary-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+    .summary-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
 
-      .question-card {
-        padding: 1.25rem;
-      }
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
 
-      .actions {
-        padding: 1rem;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
+    .tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      cursor: help;
+      margin-right: 0.25rem;
+    }
 
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
+    .tooltip:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 100%;
+      right: 50%;
+      transform: translateX(50%);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 100;
+      max-width: 250px;
+      white-space: normal;
+    }
+
+    @media (max-width: 768px) {
+      .resources-grid { grid-template-columns: 1fr; }
+      .input-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 1.25rem 1rem 3rem; }
+      .card { padding: 1.5rem; }
+      .frame-grid, .columns, .example-grid, .commitment-grid, .pros-cons, .priority-grid { grid-template-columns: 1fr; }
+      .card-actions { flex-direction: column; gap: 0.75rem; }
+      .card-actions .btn { width: 100%; justify-content: center; }
+      .progress-line { display: none; }
+      .progress-step { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
+      .resources-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-
-<div class="app">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-header">
+  <div class="container">
+    <header>
       <div class="logo">
-        <div class="logo-icon">۱۰³</div>
-        <div class="logo-text">راهنمای تصمیم</div>
+        <span class="logo-dot"></span>
+        <span>ابزار تصمیم‌گیری آگاهانه</span>
       </div>
-    </div>
-    
-    <nav class="sidebar-nav">
-      <div class="nav-section">
-        <div class="nav-title">فرایند تصمیم‌گیری</div>
-        <div class="nav-item active" data-step="0" onclick="goToStep(0)">
-          <div class="nav-icon">🎯</div>
-          <span>شروع و نوع تصمیم</span>
-        </div>
-        <div class="nav-item locked" data-step="1" onclick="goToStep(1)">
-          <div class="nav-icon">⏱️</div>
-          <span>۱۰ ثانیه: مکث</span>
-        </div>
-        <div class="nav-item locked" data-step="2" onclick="goToStep(2)">
-          <div class="nav-icon">🧠</div>
-          <span>۱۰ دقیقه: تحلیل</span>
-        </div>
-        <div class="nav-item locked" data-step="3" onclick="goToStep(3)">
-          <div class="nav-icon">🔬</div>
-          <span>۱۰ روز: عمل</span>
-        </div>
+      <h1>مدل <span class="gradient-text">۱۰–۱۰–۱۰</span></h1>
+      <p class="subtitle">
+        قبل از هر تصمیم مهم، از سه لنز زمانی بهش نگاه کن: شهود لحظه‌ای، تحلیل منطقی، و دید بلندمدت.
+      </p>
+      <div class="method-badge">
+        <span><strong>۱۰ ثانیه</strong> (سیگنال)</span>
+        <span>←</span>
+        <span><strong>۱۰ دقیقه</strong> (تحلیل)</span>
+        <span>←</span>
+        <span><strong>۱۰ روز</strong> (اقدام)</span>
       </div>
-      
-      <div class="nav-section">
-        <div class="nav-title">نتیجه</div>
-        <div class="nav-item locked" data-step="4" onclick="goToStep(4)">
-          <div class="nav-icon">📋</div>
-          <span>گزارش نهایی</span>
-        </div>
-      </div>
-    </nav>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="main">
-    <header class="main-header">
-      <div class="header-title">
-        <h2 id="stepTitle">شروع فرایند</h2>
-        <span class="header-badge" id="stepBadge">گام ۱ از ۴</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      <div class="disclaimer-box">
+        ⚠️ این ابزار جای مشاور حقوقی، پزشکی یا مالی را نمی‌گیرد. برای تصمیمات تخصصی حتماً با متخصص مشورت کنید.
       </div>
     </header>
 
-    <div class="content">
-      <div class="content-inner">
-        
-        <!-- Step 0: Intro -->
-        <div class="step-content active" id="step-0">
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۱</div>
-              <div class="question-text">
-                <h3>موضوع تصمیم چیست؟</h3>
-                <p>در یک جمله بنویس که می‌خواهی درباره چه چیزی تصمیم بگیری.</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <textarea class="text-input" id="decisionTopic" rows="2" placeholder="مثال: می‌خواهم تصمیم بگیرم که آیا شغلم را عوض کنم یا نه..."></textarea>
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۲</div>
-              <div class="question-text">
-                <h3>این تصمیم چقدر مهم است؟</h3>
-                <p>بر اساس اهمیت، مسیر متفاوتی را طی خواهی کرد.</p>
-              </div>
-            </div>
-            <div class="options-grid">
-              <label class="option-card" onclick="selectType('small')">
-                <input type="radio" name="decisionType" value="small">
-                <div class="option-indicator"></div>
-                <div class="option-content">
-                  <h4>🟢 تصمیم کوچک و روزمره</h4>
-                  <p>قابل برگشت، کم‌هزینه، مثل خرید یا فرستادن پیام</p>
-                </div>
-              </label>
-              <label class="option-card" onclick="selectType('medium')">
-                <input type="radio" name="decisionType" value="medium">
-                <div class="option-indicator"></div>
-                <div class="option-content">
-                  <h4>🟡 تصمیم متوسط و قابل تغییر</h4>
-                  <p>نیاز به فکر دارد ولی قابل اصلاح است، مثل شروع عادت جدید</p>
-                </div>
-              </label>
-              <label class="option-card" onclick="selectType('big')">
-                <input type="radio" name="decisionType" value="big">
-                <div class="option-indicator"></div>
-                <div class="option-content">
-                  <h4>🔴 تصمیم بزرگ و سرنوشت‌ساز</h4>
-                  <p>برگشتش سخت است، مثل ازدواج، مهاجرت، استعفا</p>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۳</div>
-              <div class="question-text">
-                <h3>این گزارش را برای چه کسی می‌فرستی؟</h3>
-                <p>مخاطب گزارش نهایی کیست و چه انتظاری از او داری؟</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <input type="text" class="text-input" id="audience" placeholder="مثال: مشاورم، دوست صمیمی‌ام، خودم...">
-            </div>
-            <div class="input-wrapper" style="margin-top: 1rem;">
-              <textarea class="text-input" id="expectation" rows="2" placeholder="انتظارم: فقط گوش بده / پیشنهاد بده / کمکم کن تصمیم بگیرم..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 1: 10 Seconds -->
-        <div class="step-content" id="step-1">
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۱</div>
-              <div class="question-text">
-                <h3>الان دقیقاً چه احساسی داری؟</h3>
-                <p>قبل از هر چیز، احساست را شناسایی کن.</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <input type="text" class="text-input" id="currentFeeling" placeholder="مثال: نگران، هیجان‌زده، سردرگم، امیدوار...">
-            </div>
-            <div class="slider-wrapper">
-              <div class="slider-value-box">
-                <div class="slider-value" id="feelingValue">۵</div>
-                <div class="slider-value-label">شدت احساس از ۱۰</div>
-              </div>
-              <input type="range" class="range-slider" id="feelingSlider" min="1" max="10" value="5" oninput="updateSlider('feelingValue', this.value)">
-              <div class="slider-labels">
-                <span class="slider-label">خیلی کم</span>
-                <span class="slider-label">خیلی زیاد</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۲</div>
-              <div class="question-text">
-                <h3>وضعیت جسمی و روحی‌ات الان چطور است؟</h3>
-                <p>این موارد روی کیفیت تصمیم‌گیری تأثیر می‌گذارند.</p>
-              </div>
-            </div>
-            <div class="chips-group">
-              <label class="chip" onclick="toggleChip(this)">
-                <input type="checkbox" value="گرسنه">
-                <span>🍽️ گرسنه‌ام</span>
-              </label>
-              <label class="chip" onclick="toggleChip(this)">
-                <input type="checkbox" value="خسته">
-                <span>😴 خسته‌ام</span>
-              </label>
-              <label class="chip" onclick="toggleChip(this)">
-                <input type="checkbox" value="استرسی">
-                <span>😰 استرس دارم</span>
-              </label>
-              <label class="chip" onclick="toggleChip(this)">
-                <input type="checkbox" value="عصبانی">
-                <span>😤 عصبانی‌ام</span>
-              </label>
-              <label class="chip" onclick="toggleChip(this)">
-                <input type="checkbox" value="حالم خوبه">
-                <span>✨ حالم خوبه</span>
-              </label>
-            </div>
-            <div class="info-box">
-              <span class="info-box-icon">💡</span>
-              <span>اگر گرسنه، خسته یا عصبانی هستی، شاید بهتر باشد تصمیم مهم را به بعد موکول کنی.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 2: 10 Minutes -->
-        <div class="step-content" id="step-2">
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۱</div>
-              <div class="question-text">
-                <h3>گزینه‌های پیش رویت چیست؟</h3>
-                <p>حداکثر ۲-۳ گزینه اصلی را بنویس.</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <textarea class="text-input" id="options" rows="3" placeholder="گزینه ۱: ...&#10;گزینه ۲: ...&#10;گزینه ۳: ..."></textarea>
-            </div>
-          </div>
-
-          <div class="section-divider">⏳ نگاه زمانی ۱۰–۱۰–۱۰</div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۲</div>
-              <div class="question-text">
-                <h3>📅 ۱۰ روز بعد چه اتفاقی می‌افتد؟</h3>
-                <p>اثر کوتاه‌مدت: احساس و تغییرات اولیه</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <textarea class="text-input" id="time10days" rows="2" placeholder="۱۰ روز بعد از این تصمیم..."></textarea>
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۳</div>
-              <div class="question-text">
-                <h3>📆 ۱۰ ماه بعد چه اتفاقی می‌افتد؟</h3>
-                <p>اثر میان‌مدت: روی کار، روابط و سلامتی</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <textarea class="text-input" id="time10months" rows="2" placeholder="۱۰ ماه بعد از این تصمیم..."></textarea>
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۴</div>
-              <div class="question-text">
-                <h3>🔮 ۱۰ سال بعد چه اتفاقی می‌افتد؟</h3>
-                <p>اثر بلندمدت: تصویر کلی زندگی و اهداف</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <textarea class="text-input" id="time10years" rows="2" placeholder="۱۰ سال بعد از این تصمیم..."></textarea>
-            </div>
-          </div>
-
-          <div class="section-divider">💎 ارزش‌ها و پشیمانی</div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۵</div>
-              <div class="question-text">
-                <h3>کدام ارزش‌های زندگی‌ات درگیر هستند؟</h3>
-                <p>مثل: امنیت، آزادی، خانواده، رشد، سلامتی</p>
-              </div>
-            </div>
-            <div class="input-wrapper">
-              <input type="text" class="text-input" id="values" placeholder="ارزش‌های مهم من: ...">
-            </div>
-            <div class="slider-wrapper">
-              <div class="slider-value-box">
-                <div class="slider-value" id="valuesValue">۵</div>
-                <div class="slider-value-label">هم‌خوانی با ارزش‌ها از ۱۰</div>
-              </div>
-              <input type="range" class="range-slider" id="valuesSlider" min="0" max="10" value="5" oninput="updateSlider('valuesValue', this.value)">
-            </div>
-          </div>
-
-          <div class="question-card">
-            <div class="question-header">
-              <div class="question-number">۶</div>
-              <div class="question-text">
-                <h3>از کدام بیشتر ممکن است پشیمان شوی؟</h3>
-              </div>
-            </div>
-            <div class="options-grid">
-              <label class="option-card" onclick="selectOption(this, 'regret')">
-                <input type="radio" name="regret" value="انجام دادن">
-                <div class="option-indicator"></div>
-                <div class="option-content">
-                  <h4>از انجام دادنش</h4>
-                  <p>اگر این کار را بکنم شاید پشیمان شوم</p>
-                </div>
-                <span class="option-emoji">😔</span>
-              </label>
-              <label class="option-card" onclick="selectOption(this, 'regret')">
-                <input type="radio" name="regret" value="انجام ندادن">
-                <div class="option-indicator"></div>
-                <div class="option-content">
-                  <h4>از انجام ندادنش</h4>
-                  <p>اگر این کار را نکنم شاید حسرت بخورم</p>
-                </div>
-                <span class="option-emoji">😕</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 3: 10 Days -->
-        <div class="step-content" id="step-3">
-          <div id="mediumSection" style="display: none;">
-            <div class="question-card">
-              <div class="question-header">
-                <div class="question-number">🧪</div>
-                <div class="question-text">
-                  <h3>آزمایش ۱۰ روزه</h3>
-                  <p>یک نسخه کوچک از این تصمیم را ۱۰ روز امتحان کن.</p>
-                </div>
-              </div>
-              <div class="input-wrapper">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">چه چیزی را امتحان می‌کنی؟</label>
-                <textarea class="text-input" id="experiment" rows="2" placeholder="مثال: ۱۰ روز هر روز ۱ ساعت روی پروژه جدید کار می‌کنم..."></textarea>
-              </div>
-              <div class="input-wrapper" style="margin-top: 1rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">معیار موفقیت روز دهم چیست؟</label>
-                <input type="text" class="text-input" id="successMetric" placeholder="اگر این اتفاق افتاد، یعنی موفق بوده...">
-              </div>
-            </div>
-          </div>
-
-          <div id="bigSection" style="display: none;">
-            <div class="question-card">
-              <div class="question-header">
-                <div class="question-number">📚</div>
-                <div class="question-text">
-                  <h3>تعویق فعال ۱۰ روزه</h3>
-                  <p>برای تصمیم بزرگ، ۱۰ روز وقت بگذار برای تحقیق و سناریونویسی.</p>
-                </div>
-              </div>
-              <div class="input-wrapper">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">🌟 بهترین سناریو (اگر همه چیز خوب پیش برود)</label>
-                <textarea class="text-input" id="bestCase" rows="2"></textarea>
-              </div>
-              <div class="input-wrapper" style="margin-top: 1rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">⚠️ بدترین سناریو (اگر همه چیز بد پیش برود)</label>
-                <textarea class="text-input" id="worstCase" rows="2"></textarea>
-              </div>
-              <div class="input-wrapper" style="margin-top: 1rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">👥 با چه کسانی مشورت می‌کنی؟</label>
-                <input type="text" class="text-input" id="consultants" placeholder="یک متخصص مرتبط و یک نفر قابل اعتماد">
-              </div>
-              <div class="input-wrapper" style="margin-top: 1rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">🗓️ چه زمانی این تصمیم را بازنگری می‌کنی؟</label>
-                <input type="text" class="text-input" id="reviewDate" placeholder="مثال: ۶ ماه دیگر">
-              </div>
-            </div>
-          </div>
-
-          <div id="smallSection" style="display: none;">
-            <div class="question-card">
-              <div class="question-header">
-                <div class="question-number">✅</div>
-                <div class="question-text">
-                  <h3>تصمیم نهایی</h3>
-                  <p>برای تصمیم کوچک، همین الان بر اساس گام‌های قبل انتخاب کن.</p>
-                </div>
-              </div>
-              <div class="input-wrapper">
-                <textarea class="text-input" id="finalDecision" rows="2" placeholder="تصمیم من این است که..."></textarea>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Step 4: Summary -->
-        <div class="step-content" id="step-4">
-          <div class="summary-container">
-            <div class="summary-header">
-              <h3>📋 گزارش تحلیل تصمیم</h3>
-              <button class="copy-btn" id="copyBtn" onclick="copyReport()">📋 کپی گزارش</button>
-            </div>
-            <div class="summary-content" id="summaryContent"></div>
-          </div>
-        </div>
-
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-step active" data-step="0">
+        <span class="num">۰</span>
+        <span>فریم</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="1">
+        <span class="num">۱</span>
+        <span>۱۰ ثانیه</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="2">
+        <span class="num">۲</span>
+        <span>۱۰ دقیقه</span>
+      </div>
+      <div class="progress-line"></div>
+      <div class="progress-step" data-step="3">
+        <span class="num">۳</span>
+        <span>۱۰ روز</span>
       </div>
     </div>
 
-    <footer class="actions">
-      <button class="btn btn-ghost" id="prevBtn" onclick="prevStep()" style="display: none;">
-        ← قبلی
-      </button>
-      <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
-        بعدی →
-      </button>
-    </footer>
-  </main>
-</div>
+    <main>
+      <!-- STEP 0: FRAMING -->
+      <section class="card visible" id="step-0">
+        <div class="card-header">
+          <div class="card-icon purple">🎯</div>
+          <div class="card-meta">
+            <div class="step-label">گام صفر</div>
+            <h2 class="card-title">فریم کردن مسئله</h2>
+            <p class="card-desc">
+              قبل از اینکه بپرسی «چیکار کنم؟»، باید دقیق بفهمی «مسئله‌ام دقیقاً چیه؟». بیشتر تصمیم‌های اشتباه از تعریف نادرست مسئله شروع می‌شن.
+            </p>
+          </div>
+        </div>
 
-<script>
-  // State
-  let currentStep = 0;
-  let decisionType = 'medium';
-  const totalSteps = 5;
-  
-  const stepTitles = [
-    'شروع و اطلاعات اولیه',
-    '۱۰ ثانیه: مکث و تنظیم هیجان',
-    '۱۰ دقیقه: تحلیل و نگاه زمانی',
-    '۱۰ روز: برنامه عملی',
-    'گزارش نهایی'
-  ];
+        <div class="info-box science">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Problem Framing یکی از مهم‌ترین مفاهیم در ادبیات تصمیم‌گیری است">?</span>
+            چرا فریم‌کردن مهمه؟
+          </div>
+          <p>
+            ادبیات تصمیم‌گیری نشون می‌ده که نحوه تعریف یک مسئله، مستقیماً روی راه‌حل‌هایی که می‌بینیم تأثیر می‌ذاره. اگه قاب رو اشتباه ببندی، حتی بهترین راه‌حل‌ها هم تو زمین اشتباه بازی می‌کنن.
+          </p>
+          <div class="source">الهام‌گرفته از: کارهای کانمن و تورسکی در زمینه فریم‌بندی تصمیم</div>
+        </div>
 
-  // Persian numbers
-  function toPersian(n) {
-    return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
-  }
+        <div class="collapsible" id="exampleToggle">
+          <button class="collapsible-btn" type="button">
+            <span>مثال: تفاوت «ناله» با «تعریف مسئله»</span>
+            <span>▼</span>
+          </button>
+          <div class="collapsible-content">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+              جمله‌هایی مثل «وقت کم میارم» یا «انگیزه ندارم» فقط احساس رو تخلیه می‌کنن، ولی مسئله رو تعریف نمی‌کنن:
+            </p>
+            <div class="example-grid">
+              <div class="example-item bad">
+                <div class="example-item-label">ناله (مبهم)</div>
+                «وقت کم میارم و نمی‌رسم به کارام.»
+              </div>
+              <div class="example-item good">
+                <div class="example-item-label">مسئله (دقیق)</div>
+                «می‌خوام با ۲ ساعت کار متمرکز در روز، پروژه رو تا آخر ماه تموم کنم.»
+              </div>
+            </div>
+          </div>
+        </div>
 
-  // Update slider value
-  function updateSlider(id, value) {
-    document.getElementById(id).textContent = toPersian(value);
-  }
+        <div class="divider"></div>
 
-  // Select decision type
-  function selectType(type) {
-    decisionType = type;
-    document.querySelectorAll('#step-0 .option-card').forEach(card => {
-      card.classList.remove('selected');
-    });
-    event.currentTarget.classList.add('selected');
-    
-    // Update Step 3 visibility
-    document.getElementById('smallSection').style.display = type === 'small' ? 'block' : 'none';
-    document.getElementById('mediumSection').style.display = type === 'medium' ? 'block' : 'none';
-    document.getElementById('bigSection').style.display = type === 'big' ? 'block' : 'none';
-  }
+        <div class="form-group">
+          <label class="form-label">
+            موضوع تصمیمت رو بنویس:
+            <span class="form-hint">اول خام بنویس، بعد با سؤالات پایین دقیقش می‌کنیم</span>
+          </label>
+          <input type="text" class="form-input" id="decisionTopic" placeholder="مثلاً: می‌خوام شغلم رو عوض کنم / می‌خوام مهاجرت کنم" />
+        </div>
 
-  // Select option
-  function selectOption(el, name) {
-    document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-      input.closest('.option-card').classList.remove('selected');
-    });
-    el.classList.add('selected');
-    el.querySelector('input').checked = true;
-  }
+        <div class="frame-grid">
+          <div class="frame-item">
+            <div class="frame-item-header">
+              <span class="frame-item-num">۱</span>
+              <span class="frame-item-title">الان کجایی؟</span>
+            </div>
+            <textarea class="form-input" id="currentState" placeholder="وضعیت فعلی رو با داده و حقیقت توصیف کن (نه فقط احساس)"></textarea>
+          </div>
+          <div class="frame-item">
+            <div class="frame-item-header">
+              <span class="frame-item-num">۲</span>
+              <span class="frame-item-title">می‌خوای به کجا برسی؟</span>
+            </div>
+            <textarea class="form-input" id="desiredState" placeholder="وضعیت مطلوب رو مشخص و قابل اندازه‌گیری بنویس (SMART)"></textarea>
+          </div>
+          <div class="frame-item">
+            <div class="frame-item-header">
+              <span class="frame-item-num">۳</span>
+              <span class="frame-item-title">شکاف از چه جنسیه؟</span>
+            </div>
+            <textarea class="form-input" id="gap" placeholder="چی مانع رسیدنته؟ پول؟ زمان؟ مهارت؟ شجاعت؟ اطلاعات؟"></textarea>
+          </div>
+          <div class="frame-item">
+            <div class="frame-item-header">
+              <span class="frame-item-num">۴</span>
+              <span class="frame-item-title">معیار موفقیت</span>
+            </div>
+            <textarea class="form-input" id="successCriteria" placeholder="از کجا می‌فهمی تصمیم درست بوده؟ (قابل اندازه‌گیری)"></textarea>
+          </div>
+        </div>
 
-  // Toggle chip
-  function toggleChip(el) {
-    el.classList.toggle('selected');
-    const input = el.querySelector('input');
-    input.checked = !input.checked;
-  }
+        <!-- منابع و محدودیت‌ها -->
+        <div class="form-group">
+          <label class="form-label">منابع و محدودیت‌های واقعی:</label>
+        </div>
+        <div class="resources-grid">
+          <div class="resource-item">
+            <label>زمان در هفته (ساعت)</label>
+            <input type="number" id="timeHours" placeholder="مثلاً: ۱۰" />
+          </div>
+          <div class="resource-item">
+            <label>بودجه موجود (تومان/دلار)</label>
+            <input type="text" id="moneyAvailable" placeholder="مثلاً: ۵۰ میلیون" />
+          </div>
+          <div class="resource-item">
+            <label>مهارت‌های مرتبط</label>
+            <input type="text" id="skillTags" placeholder="مثلاً: انگلیسی، برنامه‌نویسی" />
+          </div>
+        </div>
 
-  // Navigation
-  function nextStep() {
-    if (currentStep < totalSteps - 1) {
-      currentStep++;
-      updateUI();
-      
-      if (currentStep === totalSteps - 1) {
-        generateReport();
-      }
-    }
-  }
+        <div class="form-group">
+          <label class="form-label">
+            محدودیت‌ها و تعهدات:
+            <span class="form-hint">خانواده، سلامتی، قراردادها...</span>
+          </label>
+          <textarea class="form-input" id="constraints" placeholder="مثلاً: باید مراقب والدینم باشم / قرارداد کاری دارم تا ۶ ماه دیگه"></textarea>
+        </div>
 
-  function prevStep() {
-    if (currentStep > 0) {
-      currentStep--;
-      updateUI();
-    }
-  }
+        <!-- ۵ چرا - فقط برای تصمیم‌های بزرگ -->
+        <div class="adaptive-section hidden" id="whysSection">
+          <div class="adaptive-header">
+            <span style="font-size: 1.25rem;">🔗</span>
+            <div>
+              <div class="adaptive-title">تکنیک «۵ چرا» - رسیدن به ریشه</div>
+              <div class="adaptive-subtitle">برای مسائل ریشه‌دار کاربردیه. با پرسیدن «چرا» پشت سر هم، به دلیل واقعی می‌رسی (تکنیک تویوتا)</div>
+            </div>
+          </div>
+          <div class="why-row"><span class="why-num">۱</span><input type="text" id="why1" placeholder="چرا این تصمیم الان برام مهم شده؟" /></div>
+          <div class="why-row"><span class="why-num">۲</span><input type="text" id="why2" placeholder="چرا؟ (عمیق‌تر برو...)" /></div>
+          <div class="why-row"><span class="why-num">۳</span><input type="text" id="why3" placeholder="چرا؟ (بازم عمیق‌تر...)" /></div>
+          <div class="why-row"><span class="why-num">۴</span><input type="text" id="why4" placeholder="چرا؟ (داری به ریشه نزدیک میشی...)" /></div>
+          <div class="why-row"><span class="why-num">۵</span><input type="text" id="why5" placeholder="چرا؟ (احتمالاً این ریشه‌ای‌ترین دلیله)" /></div>
+        </div>
 
-  function goToStep(step) {
-    if (step <= currentStep) {
-      currentStep = step;
-      updateUI();
-    }
-  }
+        <div class="divider"></div>
 
-  function updateUI() {
-    // Update step visibility
-    document.querySelectorAll('.step-content').forEach((el, i) => {
-      el.classList.toggle('active', i === currentStep);
-    });
+        <div class="form-group">
+          <label class="form-label">
+            این تصمیم چقدر بزرگه؟
+            <span class="form-hint">بر اساس انتخابت، مسیر و عمق تحلیل متفاوت می‌شه</span>
+          </label>
+        </div>
 
-    // Update header
-    document.getElementById('stepTitle').textContent = stepTitles[currentStep];
-    document.getElementById('stepBadge').textContent = `گام ${toPersian(currentStep + 1)} از ${toPersian(totalSteps)}`;
-    
-    // Update progress
-    const progress = ((currentStep) / (totalSteps - 1)) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
+        <div class="decision-options">
+          <label class="decision-option" data-type="small">
+            <input type="radio" name="decisionType" value="small" />
+            <div class="option-icon">🟢</div>
+            <div class="option-content">
+              <div class="option-title">تصمیم کوچک و برگشت‌پذیر</div>
+              <div class="option-desc">اگه اشتباه از آب دربیاد، سریع قابل تغییره. مثل فرستادن یه پیام، خرید ارزان</div>
+              <div class="option-steps">فقط ۲ بخش: فریم + شهود سریع</div>
+            </div>
+          </label>
 
-    // Update nav
-    document.querySelectorAll('.nav-item').forEach((item, i) => {
-      item.classList.remove('active', 'completed', 'locked');
-      if (i < currentStep) item.classList.add('completed');
-      else if (i === currentStep) item.classList.add('active');
-      else item.classList.add('locked');
-    });
+          <label class="decision-option" data-type="medium">
+            <input type="radio" name="decisionType" value="medium" />
+            <div class="option-icon">🟡</div>
+            <div class="option-content">
+              <div class="option-title">تصمیم متوسط و نیمه‌برگشت‌پذیر</div>
+              <div class="option-desc">مهمه ولی اگه جواب نداد می‌شه تغییرش داد. مثل شروع یه عادت، تغییر روش کار</div>
+              <div class="option-steps">۵ بخش: تحلیل کم‌عمق</div>
+            </div>
+          </label>
 
-    // Update buttons
-    document.getElementById('prevBtn').style.display = currentStep > 0 ? 'flex' : 'none';
-    document.getElementById('nextBtn').textContent = currentStep === totalSteps - 2 ? 'مشاهده گزارش ✓' : 'بعدی →';
-    document.getElementById('nextBtn').style.display = currentStep === totalSteps - 1 ? 'none' : 'flex';
+          <label class="decision-option" data-type="big">
+            <input type="radio" name="decisionType" value="big" />
+            <div class="option-icon">🔴</div>
+            <div class="option-content">
+              <div class="option-title">تصمیم بزرگ و سخت‌برگشت</div>
+              <div class="option-desc">نتیجه‌ش سال‌ها باهاته. مثل ازدواج، مهاجرت، استعفا، خرید خونه</div>
+              <div class="option-steps">تحلیل کامل + ۱۰ روز/ماه/سال</div>
+            </div>
+          </label>
+        </div>
+      </section>
 
-    // Scroll to top
-    document.querySelector('.content').scrollTop = 0;
-  }
+      <!-- STEP 1: 10 SECONDS -->
+      <section class="card hidden" id="step-1">
+        <div class="card-header">
+          <div class="card-icon cyan">⚡</div>
+          <div class="card-meta">
+            <div class="step-label">گام یک</div>
+            <h2 class="card-title">۱۰ ثانیه — دریافت سیگنال</h2>
+            <p class="card-desc">این مرحله فقط برای ثبت سیگنال‌های بدنی و احساسی اولیه‌ست، نه تصمیم‌گیری. این واکنش‌ها داده هستن، نه حکم نهایی.</p>
+          </div>
+        </div>
 
-  // Generate Report
-  function generateReport() {
-    const getValue = id => document.getElementById(id)?.value || 'وارد نشده';
-    const getCheckedChips = () => {
-      return Array.from(document.querySelectorAll('.chip.selected input'))
-        .map(i => i.value).join('، ') || 'انتخاب نشده';
+        <div class="info-box science">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Antonio Damasio - Somatic Marker Hypothesis">?</span>
+            نشانگرهای بدنی (Somatic Markers)
+          </div>
+          <p>
+            پژوهش‌ها پیشنهاد می‌کنن که بدن قبل از ذهن آگاه، سیگنال‌هایی درباره تصمیم‌ها می‌فرسته. به حس بدنت توجه کن: گرمی، سردی، فشار سینه، سبکی.
+          </p>
+          <div class="source">الهام‌گرفته از: فرضیه نشانگرهای بدنی آنتونیو داماسیو</div>
+        </div>
+
+        <div class="info-box warning">
+          <div class="info-box-header">هشدار مهم</div>
+          <p>
+            شهود مهمه، ولی کافی نیست. این حس‌ها ممکنه از ترومای قدیمی، ترس‌های گذشته یا آرزوهای غیرواقعی باشه، نه لزوماً حکمت درونی. در گام‌های بعدی می‌سنجیم که چقدر بر اساس واقعیت امروزته.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            وقتی به این تصمیم فکر می‌کنی، چه احساسی داری؟
+            <span class="form-hint">هم احساس ذهنی و هم حس بدنی رو بنویس</span>
+          </label>
+          <textarea class="form-input" id="currentFeeling" placeholder="مثلاً: یه هیجان همراه با ترس دارم. وقتی بهش فکر می‌کنم یه فشار تو سینه‌ام حس می‌کنم..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">شدت این احساس/درگیری ذهنی چقدره؟</label>
+          <div class="rating-box">
+            <div class="rating-numbers">
+              <span class="rating-num">۱</span><span class="rating-num">۲</span><span class="rating-num">۳</span><span class="rating-num">۴</span><span class="rating-num">۵</span>
+              <span class="rating-num">۶</span><span class="rating-num">۷</span><span class="rating-num">۸</span><span class="rating-num">۹</span><span class="rating-num">۱۰</span>
+            </div>
+            <input type="range" min="1" max="10" value="5" class="rating-slider" id="feelingRating" />
+            <div class="rating-labels">
+              <span>خیلی کم</span><span>متوسط</span><span>خیلی زیاد</span>
+            </div>
+            <div class="rating-display">
+              <div class="rating-value" id="feelingRatingValue">۵</div>
+              <span style="color: var(--text-muted);">از ۱۰</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="HALT = Hungry, Angry, Lonely, Tired">?</span>
+            چک HALT — آیا الان زمان خوبی برای تصمیم‌گیریه؟
+          </div>
+          <p>معمولاً وقتی گرسنه، عصبانی، تنها یا خسته هستیم، کیفیت تصمیم‌گیری افت می‌کنه. این یه چک‌لیست تجربی مفیده.</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">الان وضعیت جسمی و روحیت چطوره؟</label>
+          <div class="checkbox-list" id="haltCheck">
+            <label class="checkbox-item"><input type="checkbox" value="گرسنه" /><span class="checkbox-box">✓</span><div class="checkbox-content"><div class="checkbox-title">گرسنه‌ام (Hungry)</div><div class="checkbox-desc">قند خون پایین = تصمیم‌های عجولانه</div></div></label>
+            <label class="checkbox-item"><input type="checkbox" value="عصبانی" /><span class="checkbox-box">✓</span><div class="checkbox-content"><div class="checkbox-title">عصبانی یا ناراحتم (Angry)</div><div class="checkbox-desc">هیجانات شدید قضاوت رو مختل می‌کنن</div></div></label>
+            <label class="checkbox-item"><input type="checkbox" value="تنها" /><span class="checkbox-box">✓</span><div class="checkbox-content"><div class="checkbox-title">احساس تنهایی می‌کنم (Lonely)</div><div class="checkbox-desc">نیاز به اتصال ممکنه تصمیم رو تحت تأثیر قرار بده</div></div></label>
+            <label class="checkbox-item"><input type="checkbox" value="خسته" /><span class="checkbox-box">✓</span><div class="checkbox-content"><div class="checkbox-title">خسته‌ام (Tired)</div><div class="checkbox-desc">خستگی قدرت تحلیل رو کم می‌کنه</div></div></label>
+            <label class="checkbox-item"><input type="checkbox" value="خوب" /><span class="checkbox-box">✓</span><div class="checkbox-content"><div class="checkbox-title">حالم خوبه، ذهنم صافه ✓</div><div class="checkbox-desc">آماده برای تصمیم‌گیری آگاهانه</div></div></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            اولین واکنش غریزیت چیه؟ (بدون سانسور)
+            <span class="form-hint">این فقط یه سیگناله، نه تصمیم نهایی</span>
+          </label>
+          <textarea class="form-input" id="gutReaction" placeholder="مثلاً: دلم می‌خواد انجامش بدم ولی یه صدایی می‌گه خطرناکه..."></textarea>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" id="backToStep0">→ قبلی</button>
+          <button class="btn btn-success" id="toStep2">ادامه ←</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: 10 MINUTES -->
+      <section class="card hidden" id="step-2">
+        <div class="card-header">
+          <div class="card-icon green">🧠</div>
+          <div class="card-meta">
+            <div class="step-label">گام دو</div>
+            <h2 class="card-title">۱۰ دقیقه — تحلیل منطقی</h2>
+            <p class="card-desc">حالا هیجان اولیه کمتر شده. وقتشه منطقی‌تر فکر کنی و از زوایای مختلف بررسی کنی.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            چه گزینه‌هایی داری؟
+            <span class="form-hint">حداقل ۳ گزینه بنویس. «هیچ‌کار نکردن» هم گزینه‌ست!</span>
+          </label>
+          <textarea class="form-input" id="options" placeholder="گزینه ۱: انجام بدم&#10;گزینه ۲: انجام ندم&#10;گزینه ۳: تأخیر بندازم&#10;گزینه ۴: نسخه کوچک‌تر امتحان کنم"></textarea>
+        </div>
+
+        <div class="info-box science">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Howard Marks - Second-Order Thinking">?</span>
+            تفکر درجه دوم
+          </div>
+          <p>به جای فقط پرسیدن «بعدش چی می‌شه؟»، بپرس «بعد از اون چی می‌شه؟». بیشتر آدم‌ها فقط عواقب مستقیم رو می‌بینن.</p>
+          <div class="source">الهام‌گرفته از: مدل مفهومی هاوارد مارکس</div>
+        </div>
+
+        <div class="columns">
+          <div class="column-card">
+            <div class="column-title">اگه انجامش بدم...</div>
+            <textarea class="form-input" id="ifYes" placeholder="عواقب مستقیم: ...&#10;عواقب غیرمستقیم (بعد از اون چی؟): ..."></textarea>
+          </div>
+          <div class="column-card">
+            <div class="column-title">اگه انجامش ندم...</div>
+            <textarea class="form-input" id="ifNo" placeholder="عواقب مستقیم: ...&#10;عواقب غیرمستقیم (بعد از اون چی؟): ..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label">
+            <span class="tooltip" data-tip="Opportunity Cost - هزینه از دست دادن گزینه‌های دیگر">?</span>
+            هزینه فرصت چیه؟
+            <span class="form-hint">اگه این کار رو انجام بدم، چه کار دیگه‌ای رو قطعاً نمی‌تونم انجام بدم؟</span>
+          </label>
+          <textarea class="form-input" id="opportunityCost" placeholder="مثلاً: اگه مهاجرت کنم، نمی‌تونم پیش خانواده‌ام باشم. اگه این شغل رو قبول کنم، نمی‌تونم اون پروژه رو شروع کنم..."></textarea>
+        </div>
+
+        <div class="info-box danger">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Devil's Advocate - تکنیک مقابله با Confirmation Bias">?</span>
+            وکیل مدافع شیطان
+          </div>
+          <p>یه دلیل محکم بیار که چرا این تصمیم ممکنه احمقانه‌ترین کار ممکن باشه؟ این کمک می‌کنه از سوگیری تأیید فرار کنی.</p>
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-input" id="devilAdvocate" placeholder="بدترین استدلال علیه این تصمیم چیه؟ چرا ممکنه کاملاً اشتباه باشه؟"></textarea>
+        </div>
+
+        <div class="info-box tip">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Outside View - Kahneman - مقابله با توهم خاص بودن">?</span>
+            دیدگاه بیرونی (Outside View)
+          </div>
+          <p>ما معمولاً فکر می‌کنیم «من خاصم». ولی آمار و تجربه دیگران چی می‌گه؟ این کمک می‌کنه از توهم خاص بودن فرار کنی.</p>
+        </div>
+
+        <div class="columns">
+          <div class="column-card">
+            <div class="column-title">داده‌ها و آمار واقعی (Base Rate)</div>
+            <textarea class="form-input" id="baseRate" placeholder="چه آماری از موفقیت/شکست این مسیر بلدم؟ نرخ پایه چقدره؟&#10;مثلاً: نرخ موفقیت استارتاپ‌ها ۱۰٪ هست..."></textarea>
+          </div>
+          <div class="column-card">
+            <div class="column-title">تجربه دیگران</div>
+            <textarea class="form-input" id="othersExperience" placeholder="با ۲-۳ نفر که این مسیر رو رفتن صحبت کردم؟ چی گفتن؟"></textarea>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label">
+            فرض‌های کلیدی من چیه؟
+            <span class="form-hint">چه چیزایی رو فرض گرفتم که اگه اشتباه باشن، کل تصمیم عوض می‌شه؟</span>
+          </label>
+          <textarea class="form-input" id="keyAssumptions" placeholder="فرض ۱: فرض کردم که بازار کار اونجا خوبه&#10;فرض ۲: فرض کردم که زبانم کافیه&#10;فرض ۳: فرض کردم که خانواده‌ام حمایت می‌کنن"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="tooltip" data-tip="Falsification - کارل پوپر">?</span>
+            چه شواهدی نظرم رو عوض می‌کنه؟
+            <span class="form-hint">اگه چه چیزی ببینم یا بشنوم، می‌فهمم که اشتباه می‌کنم؟</span>
+          </label>
+          <textarea class="form-input" id="falsification" placeholder="مثلاً: اگه ۳ نفر متخصص بگن این کار نکن، نظرم عوض می‌شه...&#10;اگه بفهمم هزینه‌ها ۲ برابر تخمینم هست..."></textarea>
+        </div>
+
+        <!-- چک سوگیری هزینه غرق‌شده -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="tooltip" data-tip="Sunk Cost Fallacy - سوگیری هزینه غرق‌شده">?</span>
+            اگه امروز از صفر شروع می‌کردم (بدون در نظر گرفتن پول/زمانی که تا حالا گذاشتم)، باز هم همین مسیر رو انتخاب می‌کردم؟
+          </label>
+          <textarea class="form-input" id="sunkCostCheck" placeholder="آره چون... / نه چون..."></textarea>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="tooltip" data-tip="Regret Minimization Framework - Jeff Bezos">?</span>
+            از کدوم بیشتر پشیمون می‌شی؟
+          </label>
+          <div class="radio-grid" id="regretChoice">
+            <label class="radio-card"><input type="radio" name="regret" value="action" /><div class="radio-card-icon">😔</div><div class="radio-card-title">از انجام دادنش</div><div class="radio-card-desc">اگه بکنم شاید پشیمون شم</div></label>
+            <label class="radio-card"><input type="radio" name="regret" value="inaction" /><div class="radio-card-icon">😕</div><div class="radio-card-title">از انجام ندادنش</div><div class="radio-card-desc">اگه نکنم حسرتش می‌مونه</div></label>
+            <label class="radio-card"><input type="radio" name="regret" value="equal" /><div class="radio-card-icon">⚖️</div><div class="radio-card-title">تقریباً مساوی</div><div class="radio-card-desc">هر دو ممکنه پشیمون‌کننده باشن</div></label>
+          </div>
+        </div>
+
+        <!-- اولویت‌بندی ارزش‌ها -->
+        <div class="priority-section hidden" id="prioritySection">
+          <div class="priority-title">⚖️ اولویت‌بندی عوامل - کدوم برات مهم‌تره؟</div>
+          <div class="priority-grid">
+            <label class="priority-item">
+              <input type="radio" name="priority1" value="رشد" />
+              <span class="priority-label">رشد و پیشرفت</span>
+            </label>
+            <label class="priority-item">
+              <input type="radio" name="priority1" value="امنیت" />
+              <span class="priority-label">امنیت و ثبات</span>
+            </label>
+            <label class="priority-item">
+              <input type="radio" name="priority2" value="آزادی" />
+              <span class="priority-label">آزادی و استقلال</span>
+            </label>
+            <label class="priority-item">
+              <input type="radio" name="priority2" value="خانواده" />
+              <span class="priority-label">خانواده و روابط</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Deep Analysis (Big decisions only) -->
+        <div class="deep-section hidden" id="deepAnalysis">
+          <div class="deep-section-header">
+            <span class="deep-section-icon">🔮</span>
+            <div>
+              <div class="deep-section-title">تحلیل عمیق: ۱۰ روز، ۱۰ ماه، ۱۰ سال</div>
+              <div class="deep-section-subtitle">یه تکنیک شهودی برای تصمیم‌های بزرگ. با لنز زمانی بلندتر نگاه کن. (این یه مدل تجربی مفیده، نه علم سخت)</div>
+            </div>
+          </div>
+
+          <div class="time-box">
+            <div class="time-box-header">
+              <span class="time-box-icon">📅</span>
+              <div><div class="time-box-title">۱۰ روز بعد</div><div class="time-box-subtitle">تغییرات اولیه</div></div>
+            </div>
+            <div class="pros-cons">
+              <div class="pros-box"><div class="pros-header">✅ سودها</div><textarea class="form-input" id="pros10days" placeholder="چه چیزهای خوبی اتفاق افتاده؟"></textarea></div>
+              <div class="cons-box"><div class="cons-header">❌ زیان‌ها</div><textarea class="form-input" id="cons10days" placeholder="چه سختی‌هایی داری؟"></textarea></div>
+            </div>
+          </div>
+
+          <div class="time-box">
+            <div class="time-box-header">
+              <span class="time-box-icon">📆</span>
+              <div><div class="time-box-title">۱۰ ماه بعد</div><div class="time-box-subtitle">تغییرات واقعی</div></div>
+            </div>
+            <div class="pros-cons">
+              <div class="pros-box"><div class="pros-header">✅ سودها</div><textarea class="form-input" id="pros10months" placeholder="به چه دستاوردهایی رسیدی؟"></textarea></div>
+              <div class="cons-box"><div class="cons-header">❌ زیان‌ها</div><textarea class="form-input" id="cons10months" placeholder="چه چیزایی رو قربانی کردی؟"></textarea></div>
+            </div>
+          </div>
+
+          <div class="time-box">
+            <div class="time-box-header">
+              <span class="time-box-icon">🔮</span>
+              <div><div class="time-box-title">۱۰ سال بعد</div><div class="time-box-subtitle">تأثیر بلندمدت</div></div>
+            </div>
+            <div class="pros-cons">
+              <div class="pros-box"><div class="pros-header">✅ سودها</div><textarea class="form-input" id="pros10years" placeholder="این تصمیم چطور زندگیت رو بهتر کرده؟"></textarea></div>
+              <div class="cons-box"><div class="cons-header">❌ زیان‌ها</div><textarea class="form-input" id="cons10years" placeholder="چه بهایی پرداختی؟"></textarea></div>
+            </div>
+          </div>
+
+          <div class="columns">
+            <div class="column-card"><div class="column-title">تأثیر روی کار و درآمد</div><textarea class="form-input" id="workImpact" placeholder="شغل، درآمد، مهارت‌ها..."></textarea></div>
+            <div class="column-card"><div class="column-title">تأثیر روی روابط</div><textarea class="form-input" id="relationshipImpact" placeholder="خانواده، دوستان، رابطه عاطفی..."></textarea></div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;"><label class="form-label">تأثیر روی سلامت و آرامش</label><textarea class="form-input" id="healthImpact" placeholder="سلامت جسمی، سلامت روان، استرس..."></textarea></div>
+
+          <div class="form-group">
+            <label class="form-label">ارزش‌های مهم زندگیت (به ترتیب اولویت)</label>
+            <input type="text" class="form-input" id="values" placeholder="مثلاً: خانواده، رشد، امنیت، آزادی..." />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">این تصمیم چقدر با ارزش‌هات هم‌راستاست؟</label>
+            <div class="rating-box">
+              <div class="rating-numbers">
+                <span class="rating-num">۰</span><span class="rating-num">۱</span><span class="rating-num">۲</span><span class="rating-num">۳</span><span class="rating-num">۴</span><span class="rating-num">۵</span>
+                <span class="rating-num">۶</span><span class="rating-num">۷</span><span class="rating-num">۸</span><span class="rating-num">۹</span><span class="rating-num">۱۰</span>
+              </div>
+              <input type="range" min="0" max="10" value="5" class="rating-slider" id="valuesRating" />
+              <div class="rating-labels"><span>کاملاً مغایر</span><span>خنثی</span><span>کاملاً هم‌راستا</span></div>
+              <div class="rating-display"><div class="rating-value" id="valuesRatingValue">۵</div><span style="color: var(--text-muted);">از ۱۰</span></div>
+            </div>
+          </div>
+
+          <div class="info-box danger">
+            <div class="info-box-header">
+              <span class="tooltip" data-tip="Pre-mortem - Gary Klein - مقابله با Overconfidence">?</span>
+              پیش‌کالبدشکافی (Pre-mortem)
+            </div>
+            <p>فرض کن ۶ ماه گذشته و این تصمیم کاملاً شکست خورده. حالا بگو چرا شکست خورد؟ این تکنیک کمک می‌کنه ریسک‌هایی که نمی‌بینی رو ببینی.</p>
+            <div class="source">تکنیک گری کلاین برای مقابله با خطای اطمینان بیش‌ازحد</div>
+          </div>
+
+          <div class="form-group"><textarea class="form-input" id="premortem" placeholder="چرا شکست خوردم؟ چی رو ندیده بودم؟ چه اشتباهی کردم؟"></textarea></div>
+
+          <div class="columns">
+            <div class="column-card"><div class="column-title">🌟 بهترین سناریو</div><textarea class="form-input" id="bestCase" placeholder="اگه همه چیز عالی پیش بره، چی می‌شه؟"></textarea></div>
+            <div class="column-card"><div class="column-title">⚠️ بدترین سناریو</div><textarea class="form-input" id="worstCase" placeholder="اگه همه چیز خراب بشه، چی می‌شه؟ قابل جبرانه؟"></textarea></div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" id="backToStep1">→ قبلی</button>
+          <button class="btn btn-success" id="toStep3">ادامه ←</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: 10 DAYS -->
+      <section class="card hidden" id="step-3">
+        <div class="card-header">
+          <div class="card-icon orange">🚀</div>
+          <div class="card-meta">
+            <div class="step-label">گام سه</div>
+            <h2 class="card-title">۱۰ روز — تصمیم و اقدام</h2>
+            <p class="card-desc">حالا وقتشه تصمیم نهایی رو بگیری و برنامه اجرا بچینی.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">قبل از تصمیم نهایی، می‌خوای چیکار کنی؟</label>
+          <div class="radio-grid" id="actionType">
+            <label class="radio-card"><input type="radio" name="actionType" value="experiment" /><div class="radio-card-icon">🧪</div><div class="radio-card-title">آزمایش کوچک</div><div class="radio-card-desc">یه نسخه کوچیک امتحان می‌کنم قبل از تعهد کامل</div></label>
+            <label class="radio-card"><input type="radio" name="actionType" value="research" /><div class="radio-card-icon">📚</div><div class="radio-card-title">تحقیق و مشورت</div><div class="radio-card-desc">با متخصص‌ها صحبت می‌کنم، داده جمع می‌کنم</div></label>
+            <label class="radio-card"><input type="radio" name="actionType" value="wait" /><div class="radio-card-icon">⏸️</div><div class="radio-card-title">صبر آگاهانه</div><div class="radio-card-desc">الان زمانش نیست، یه تاریخ مشخص می‌ذارم برای بازبینی</div></label>
+            <label class="radio-card"><input type="radio" name="actionType" value="ready" /><div class="radio-card-icon">✅</div><div class="radio-card-title">آماده اقدام</div><div class="radio-card-desc">اطلاعات کافی دارم، وقت اقدامه</div></label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">سطح ریسک‌پذیری من در این تصمیم</label>
+          <div class="radio-grid" id="riskTolerance">
+            <label class="radio-card"><input type="radio" name="riskTolerance" value="low" /><div class="radio-card-icon">🛡️</div><div class="radio-card-title">کم</div><div class="radio-card-desc">امنیت مهم‌تره</div></label>
+            <label class="radio-card"><input type="radio" name="riskTolerance" value="medium" /><div class="radio-card-icon">⚖️</div><div class="radio-card-title">متوسط</div><div class="radio-card-desc">ریسک حساب‌شده</div></label>
+            <label class="radio-card"><input type="radio" name="riskTolerance" value="high" /><div class="radio-card-icon">🎯</div><div class="radio-card-title">زیاد</div><div class="radio-card-desc">آماده ریسک بالام</div></label>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">ددلاین تصمیم</label>
+            <input type="text" class="form-input" id="decisionDeadline" placeholder="آخرین تاریخ که باید تصمیم گرفته باشم" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">تاریخ بازبینی</label>
+            <input type="text" class="form-input" id="reviewDate" placeholder="کِی برمی‌گردم و می‌سنجم؟" />
+          </div>
+        </div>
+
+        <div class="info-box warning">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Kill Criteria - برای جلوگیری از ادامه دادن اشتباه">?</span>
+            معیار خروج (Kill Criteria)
+          </div>
+          <p>دقیقاً چه اتفاقی بیفته که می‌فهمی باید این مسیر رو رها کنی؟ این برای جلوگیری از ادامه دادن اشتباه خیلی مهمه.</p>
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-input" id="killCriteria" placeholder="مثلاً:&#10;- اگه بعد از ۳ ماه هیچ پیشرفتی نداشتم...&#10;- اگه این مقدار پول از دست دادم...&#10;- اگه این علائم رو دیدم..."></textarea>
+        </div>
+
+        <div class="info-box science">
+          <div class="info-box-header">
+            <span class="tooltip" data-tip="Implementation Intentions - Peter Gollwitzer">?</span>
+            قصد اجرایی (Implementation Intention)
+          </div>
+          <p>در بسیاری از پژوهش‌ها نشون داده شده که تصمیم‌ها وقتی به شکل «اگر X، آنگاه Y» نوشته بشن، احتمال اجرا تا ۲-۳ برابر بیشتر می‌شه.</p>
+          <div class="source">الهام‌گرفته از: پژوهش‌های پیتر گالویتزر</div>
+        </div>
+
+        <div class="commitment-box">
+          <div class="commitment-header">
+            <span style="font-size: 1.25rem;">📝</span>
+            <div><div class="commitment-title">تعهدنامه اقدام</div><div class="commitment-subtitle">تصمیمت رو به برنامه مشخص تبدیل کن</div></div>
+          </div>
+
+          <div class="commitment-grid">
+            <div class="commitment-item"><div class="commitment-item-label">تاریخ شروع</div><input type="text" class="form-input" id="startDate" placeholder="کِی شروع می‌کنم؟" /></div>
+            <div class="commitment-item"><div class="commitment-item-label">اولین قدم کوچک</div><input type="text" class="form-input" id="firstStep" placeholder="اولین کار عملی چیه؟" /></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">فرمت «اگر-آنگاه»</label>
+            <div class="input-row">
+              <input type="text" class="form-input" id="ifWhen" placeholder="اگر [زمان/موقعیت]..." />
+              <input type="text" class="form-input" id="thenAction" placeholder="آنگاه [عمل مشخص]" />
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">به کی می‌گم؟ (تعهد اجتماعی)</label>
+            <input type="text" class="form-input" id="accountability" placeholder="مثلاً: به همسرم می‌گم، به دوستم..." />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group">
+          <label class="form-label">
+            انتظار من از تحلیلگر (انسان یا AI)
+            <span class="form-hint">دقیق بنویس چه کمکی می‌خوای؟ این به تحلیلگر کمک می‌کنه بهتر جواب بده</span>
+          </label>
+          <textarea class="form-input" id="expectations" placeholder="مثلاً:&#10;- نقاط کورم رو بهم بگو&#10;- ریسک‌هایی که ندیدم رو لیست کن&#10;- ۳ سناریو (بهترین، واقعی، بدترین) بده&#10;- برنامه ۳۰ روزه بده&#10;- اگه فکر می‌کنی اشتباه می‌کنم صادقانه بگو"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">تصمیم نهایی</label>
+          <textarea class="form-input" id="finalDecision" placeholder="تصمیم گرفتم که... اولین قدم اینه که... تا [تاریخ] این کار رو شروع می‌کنم."></textarea>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" id="backToStep2">→ قبلی</button>
+          <button class="btn btn-success" id="showSummary">مشاهده گزارش ←</button>
+        </div>
+      </section>
+
+      <!-- SUMMARY -->
+      <section class="card hidden" id="step-summary">
+        <div class="card-header">
+          <div class="card-icon green">📋</div>
+          <div class="card-meta">
+            <div class="step-label">گزارش نهایی</div>
+            <h2 class="card-title">گزارش تحلیل تصمیم</h2>
+            <p class="card-desc">این گزارش رو کپی کن و برای مشاور یا هوش مصنوعی بفرست.</p>
+          </div>
+        </div>
+
+        <div class="summary-container">
+          <div class="summary-header">
+            <div class="summary-title">متن گزارش</div>
+            <div class="summary-buttons">
+              <button class="copy-btn" id="copyBtn"><span>📋</span> کپی متن</button>
+              <button class="copy-btn" id="copyJsonBtn"><span>{ }</span> کپی JSON</button>
+            </div>
+          </div>
+          <div class="summary-content" id="summaryContent"></div>
+        </div>
+
+        <div class="card-actions" style="justify-content: center;">
+          <button class="btn btn-primary" id="resetAll">شروع از اول</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let currentStep = 0;
+    let decisionType = null;
+    let maxSteps = 1;
+
+    const cards = {
+      0: document.getElementById('step-0'),
+      1: document.getElementById('step-1'),
+      2: document.getElementById('step-2'),
+      3: document.getElementById('step-3'),
+      summary: document.getElementById('step-summary')
     };
-    const getRadio = name => {
-      const el = document.querySelector(`input[name="${name}"]:checked`);
-      return el ? el.value : 'انتخاب نشده';
-    };
 
-    const date = new Date().toLocaleDateString('fa-IR');
-    const time = new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
-    
-    const typeLabel = decisionType === 'small' ? 'کوچک و روزمره 🟢' : 
-                      decisionType === 'medium' ? 'متوسط و قابل تغییر 🟡' : 'بزرگ و سرنوشت‌ساز 🔴';
-
-    let report = `╔══════════════════════════════════════════════════════════════╗
-║            📋 گزارش تصمیم‌گیری با مدل ۱۰–۱۰–۱۰              ║
-╚══════════════════════════════════════════════════════════════╝
-
-📅 تاریخ: ${date} | 🕐 ساعت: ${time}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📖 درباره این گزارش
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-این گزارش با روش «۱۰–۱۰–۱۰» تهیه شده که دو لایه دارد:
-
-🔹 لایه فرایندی:
-   ۱۰ ثانیه → مکث و تنظیم هیجان
-   ۱۰ دقیقه → تحلیل و بررسی گزینه‌ها
-   ۱۰ روز → آزمایش یا تعویق فعال
-
-🔹 لایه زمانی:
-   ۱۰ روز بعد → اثر کوتاه‌مدت
-   ۱۰ ماه بعد → اثر میان‌مدت
-   ۱۰ سال بعد → اثر بلندمدت
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🎯 اطلاعات کلی
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📌 موضوع تصمیم: ${getValue('decisionTopic')}
-📊 نوع تصمیم: ${typeLabel}
-👤 مخاطب گزارش: ${getValue('audience')}
-💭 انتظار از خواننده: ${getValue('expectation')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ گام ۱۰ ثانیه: وضعیت آنی
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🧠 احساس فعلی: ${getValue('currentFeeling')}
-📈 شدت احساس: ${toPersian(document.getElementById('feelingSlider')?.value || 5)} از ۱۰
-🏃 وضعیت بدن: ${getCheckedChips()}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🧠 گام ۱۰ دقیقه: تحلیل
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 گزینه‌ها:
-${getValue('options')}
-
-⏳ نگاه زمانی ۱۰–۱۰–۱۰:
-┌─────────────────────────────────────────────────────────────┐
-│ 📅 ۱۰ روز بعد:                                              │
-│ ${getValue('time10days')}
-├─────────────────────────────────────────────────────────────┤
-│ 📆 ۱۰ ماه بعد:                                              │
-│ ${getValue('time10months')}
-├─────────────────────────────────────────────────────────────┤
-│ 🔮 ۱۰ سال بعد:                                              │
-│ ${getValue('time10years')}
-└─────────────────────────────────────────────────────────────┘
-
-💎 ارزش‌های درگیر: ${getValue('values')}
-📊 هم‌خوانی با ارزش‌ها: ${toPersian(document.getElementById('valuesSlider')?.value || 5)} از ۱۰
-🤔 ترس از پشیمانی: ${getRadio('regret')}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔬 گام ۱۰ روز: برنامه عملی
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-`;
-
-    if (decisionType === 'small') {
-      report += `
-✅ تصمیم نهایی:
-${getValue('finalDecision')}
-`;
-    } else if (decisionType === 'medium') {
-      report += `
-🧪 آزمایش ۱۰ روزه:
-${getValue('experiment')}
-
-📏 معیار موفقیت:
-${getValue('successMetric')}
-`;
-    } else {
-      report += `
-🌟 بهترین سناریو:
-${getValue('bestCase')}
-
-⚠️ بدترین سناریو:
-${getValue('worstCase')}
-
-👥 مشاوران: ${getValue('consultants')}
-🗓️ تاریخ بازنگری: ${getValue('reviewDate')}
-`;
+    function toPersian(n) {
+      return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
     }
 
-    report += `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💬 راهنما برای خواننده گزارش
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-سلام! این گزارش را برایت فرستادم چون نظرت برایم مهم است.
-
-📌 از تو می‌خواهم:
-• صادقانه نظر بده، حتی اگر مخالف باشی
-• نقاط کور را بهم بگو
-• اگر تجربه مشابهی داری، به اشتراک بذار
-• سؤال بپرس اگر چیزی نامفهوم است
-
-🔍 به این سؤالات فکر کن:
-• آیا گزینه‌ای هست که ندیده باشم؟
-• ریسکی می‌بینی که نادیده گرفتم؟
-• اگر جای من بودی چه می‌کردی؟
-
-⚠️ توجه:
-• نظر تو مشورت است، تصمیم نهایی با خودم است
-• لازم نیست فوری جواب بدهی
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✨ این گزارش با ابزار تصمیم‌گیری ۱۰–۱۰–۱۰ ساخته شده
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
-
-    document.getElementById('summaryContent').textContent = report;
-  }
-
-  // Copy Report
-  function copyReport() {
-    const text = document.getElementById('summaryContent').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copyBtn');
-      btn.textContent = '✓ کپی شد!';
-      btn.classList.add('copied');
+    function showCard(key) {
+      Object.values(cards).forEach(c => {
+        c.classList.add('hidden');
+        c.classList.remove('visible');
+      });
       setTimeout(() => {
-        btn.textContent = '📋 کپی گزارش';
-        btn.classList.remove('copied');
-      }, 2000);
+        cards[key].classList.remove('hidden');
+        setTimeout(() => {
+          cards[key].classList.add('visible');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 50);
+      }, 300);
+    }
+
+    function updateProgress() {
+      document.querySelectorAll('.progress-step').forEach(s => {
+        const n = parseInt(s.dataset.step);
+        s.classList.remove('active', 'done');
+        if (n < currentStep) s.classList.add('done');
+        else if (n === currentStep) s.classList.add('active');
+      });
+      document.querySelectorAll('.progress-line').forEach((l, i) => {
+        l.classList.toggle('done', i < currentStep);
+      });
+    }
+
+    // Collapsible
+    document.querySelectorAll('.collapsible-btn').forEach(btn => {
+      btn.addEventListener('click', () => btn.closest('.collapsible').classList.toggle('open'));
     });
-  }
 
-  // Initialize
-  updateUI();
-</script>
+    // Decision Options - ADAPTIVE SYSTEM
+    document.querySelectorAll('.decision-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.decision-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        decisionType = opt.dataset.type;
+        
+        // Adaptive: Show/Hide sections based on decision type
+        const whysSection = document.getElementById('whysSection');
+        const prioritySection = document.getElementById('prioritySection');
+        const deepAnalysis = document.getElementById('deepAnalysis');
+        
+        if (decisionType === 'small') {
+          maxSteps = 1;
+          whysSection.classList.add('hidden');
+          prioritySection.classList.add('hidden');
+          deepAnalysis.classList.add('hidden');
+        } else if (decisionType === 'medium') {
+          maxSteps = 2;
+          whysSection.classList.add('hidden');
+          prioritySection.classList.remove('hidden');
+          deepAnalysis.classList.add('hidden');
+        } else {
+          maxSteps = 3;
+          whysSection.classList.remove('hidden');
+          prioritySection.classList.remove('hidden');
+          deepAnalysis.classList.remove('hidden');
+        }
 
+        setTimeout(() => {
+          currentStep = 1;
+          updateProgress();
+          showCard(1);
+        }, 400);
+      });
+    });
+
+    // Sliders
+    document.getElementById('feelingRating').addEventListener('input', function() {
+      document.getElementById('feelingRatingValue').textContent = toPersian(this.value);
+    });
+
+    document.getElementById('valuesRating')?.addEventListener('input', function() {
+      document.getElementById('valuesRatingValue').textContent = toPersian(this.value);
+    });
+
+    // Checkboxes
+    document.querySelectorAll('.checkbox-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const cb = item.querySelector('input');
+        cb.checked = !cb.checked;
+        item.classList.toggle('checked', cb.checked);
+      });
+    });
+
+    // Radio Cards
+    document.querySelectorAll('.radio-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const name = card.querySelector('input').name;
+        document.querySelectorAll(`.radio-card input[name="${name}"]`).forEach(r => {
+          r.closest('.radio-card').classList.remove('selected');
+        });
+        card.classList.add('selected');
+        card.querySelector('input').checked = true;
+      });
+    });
+
+    // Priority Items
+    document.querySelectorAll('.priority-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const name = item.querySelector('input').name;
+        document.querySelectorAll(`.priority-item input[name="${name}"]`).forEach(r => {
+          r.closest('.priority-item').classList.remove('selected');
+        });
+        item.classList.add('selected');
+        item.querySelector('input').checked = true;
+      });
+    });
+
+    // Navigation
+    document.getElementById('backToStep0').addEventListener('click', () => {
+      currentStep = 0;
+      decisionType = null;
+      document.querySelectorAll('.decision-option').forEach(o => o.classList.remove('selected'));
+      updateProgress();
+      showCard(0);
+    });
+
+    document.getElementById('toStep2').addEventListener('click', () => {
+      if (maxSteps === 1) {
+        document.getElementById('summaryContent').textContent = generateSummary();
+        showCard('summary');
+      } else {
+        currentStep = 2;
+        updateProgress();
+        showCard(2);
+      }
+    });
+
+    document.getElementById('backToStep1').addEventListener('click', () => {
+      currentStep = 1;
+      updateProgress();
+      showCard(1);
+    });
+
+    document.getElementById('toStep3').addEventListener('click', () => {
+      if (maxSteps === 2) {
+        document.getElementById('summaryContent').textContent = generateSummary();
+        showCard('summary');
+      } else {
+        currentStep = 3;
+        updateProgress();
+        showCard(3);
+      }
+    });
+
+    document.getElementById('backToStep2').addEventListener('click', () => {
+      currentStep = 2;
+      updateProgress();
+      showCard(2);
+    });
+
+    document.getElementById('showSummary').addEventListener('click', () => {
+      document.getElementById('summaryContent').textContent = generateSummary();
+      showCard('summary');
+    });
+
+    // Build JSON
+    function buildDecisionJSON() {
+      const v = id => document.getElementById(id)?.value?.trim() || '';
+      const today = new Date();
+      
+      const haltChecks = [];
+      document.querySelectorAll('#haltCheck .checkbox-item.checked').forEach(i => {
+        haltChecks.push(i.querySelector('.checkbox-title').textContent.trim());
+      });
+
+      const regretRadio = document.querySelector('input[name="regret"]:checked');
+      const actionRadio = document.querySelector('input[name="actionType"]:checked');
+      const riskRadio = document.querySelector('input[name="riskTolerance"]:checked');
+      const priority1 = document.querySelector('input[name="priority1"]:checked');
+      const priority2 = document.querySelector('input[name="priority2"]:checked');
+
+      return {
+        decision_id: 'dec-' + Date.now(),
+        created_at: today.toISOString(),
+        decision_size: decisionType || 'medium',
+        topic_short: v('decisionTopic'),
+        frame: {
+          current_state: v('currentState'),
+          desired_state: v('desiredState'),
+          gap_description: v('gap'),
+          success_criteria: v('successCriteria'),
+          constraints: v('constraints')
+        },
+        resources: {
+          time_hours_per_week: v('timeHours'),
+          money_available: v('moneyAvailable'),
+          skill_tags: v('skillTags').split(',').map(s => s.trim()).filter(Boolean)
+        },
+        motivation: {
+          why_chain: [v('why1'), v('why2'), v('why3'), v('why4'), v('why5')].filter(Boolean),
+          top_values: v('values').split(',').map(s => s.trim()).filter(Boolean),
+          priorities: {
+            growth_vs_security: priority1?.value || null,
+            freedom_vs_family: priority2?.value || null
+          }
+        },
+        feeling: {
+          current_feeling: v('currentFeeling'),
+          feeling_rating: parseInt(document.getElementById('feelingRating')?.value || 5),
+          halt_flags: haltChecks,
+          gut_reaction: v('gutReaction')
+        },
+        analysis: {
+          options: v('options'),
+          if_yes: v('ifYes'),
+          if_no: v('ifNo'),
+          opportunity_cost: v('opportunityCost'),
+          devil_advocate: v('devilAdvocate'),
+          base_rate: v('baseRate'),
+          others_experience: v('othersExperience'),
+          key_assumptions: v('keyAssumptions').split('\n').filter(Boolean),
+          falsification_criteria: v('falsification').split('\n').filter(Boolean),
+          sunk_cost_check: v('sunkCostCheck'),
+          regret_direction: regretRadio?.value || null
+        },
+        timeline_analysis: {
+          pros_10_days: v('pros10days'),
+          cons_10_days: v('cons10days'),
+          pros_10_months: v('pros10months'),
+          cons_10_months: v('cons10months'),
+          pros_10_years: v('pros10years'),
+          cons_10_years: v('cons10years'),
+          work_impact: v('workImpact'),
+          relationship_impact: v('relationshipImpact'),
+          health_impact: v('healthImpact'),
+          values_alignment: parseInt(document.getElementById('valuesRating')?.value || 5),
+          premortem: v('premortem'),
+          best_case: v('bestCase'),
+          worst_case: v('worstCase')
+        },
+        action_plan: {
+          action_type: actionRadio?.value || null,
+          risk_tolerance: riskRadio?.value || null,
+          decision_deadline: v('decisionDeadline'),
+          review_date: v('reviewDate'),
+          kill_criteria: v('killCriteria'),
+          start_date: v('startDate'),
+          first_step: v('firstStep'),
+          if_when: v('ifWhen'),
+          then_action: v('thenAction'),
+          accountability: v('accountability'),
+          final_decision: v('finalDecision')
+        },
+        expectations_from_reader: v('expectations').split('\n').filter(Boolean)
+      };
+    }
+
+    // Copy JSON
+    document.getElementById('copyJsonBtn').addEventListener('click', async function() {
+      const json = buildDecisionJSON();
+      const text = JSON.stringify(json, null, 2);
+      try {
+        await navigator.clipboard.writeText(text);
+        this.classList.add('copied');
+        this.innerHTML = '<span>✓</span> کپی شد!';
+        setTimeout(() => {
+          this.classList.remove('copied');
+          this.innerHTML = '<span>{ }</span> کپی JSON';
+        }, 2000);
+      } catch(e) {
+        alert('کپی نشد. لطفاً دستی کپی کنید.');
+      }
+    });
+
+    // Copy Text
+    document.getElementById('copyBtn').addEventListener('click', async function() {
+      const text = document.getElementById('summaryContent').textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        this.classList.add('copied');
+        this.innerHTML = '<span>✓</span> کپی شد!';
+        setTimeout(() => {
+          this.classList.remove('copied');
+          this.innerHTML = '<span>📋</span> کپی متن';
+        }, 2000);
+      } catch(e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        this.classList.add('copied');
+        this.innerHTML = '<span>✓</span> کپی شد!';
+        setTimeout(() => {
+          this.classList.remove('copied');
+          this.innerHTML = '<span>📋</span> کپی متن';
+        }, 2000);
+      }
+    });
+
+    // Reset
+    document.getElementById('resetAll').addEventListener('click', () => {
+      if (!confirm('مطمئنی می‌خوای از اول شروع کنی؟ تمام اطلاعات پاک می‌شه.')) return;
+      currentStep = 0;
+      decisionType = null;
+      maxSteps = 1;
+      document.querySelectorAll('.form-input').forEach(i => i.value = '');
+      document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => {
+        if (i.id) i.value = '';
+      });
+      document.querySelectorAll('.checkbox-item').forEach(i => {
+        i.classList.remove('checked');
+        i.querySelector('input').checked = false;
+      });
+      document.querySelectorAll('.radio-card').forEach(c => {
+        c.classList.remove('selected');
+        c.querySelector('input').checked = false;
+      });
+      document.querySelectorAll('.priority-item').forEach(c => {
+        c.classList.remove('selected');
+        c.querySelector('input').checked = false;
+      });
+      document.querySelectorAll('.decision-option').forEach(o => o.classList.remove('selected'));
+      document.getElementById('feelingRating').value = 5;
+      document.getElementById('feelingRatingValue').textContent = '۵';
+      document.getElementById('valuesRating').value = 5;
+      document.getElementById('valuesRatingValue').textContent = '۵';
+      document.getElementById('deepAnalysis').classList.add('hidden');
+      document.getElementById('whysSection').classList.add('hidden');
+      document.getElementById('prioritySection').classList.add('hidden');
+      updateProgress();
+      showCard(0);
+    });
+
+    function generateSummary() {
+      const v = id => document.getElementById(id)?.value || '';
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('fa-IR');
+      const timeStr = today.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+      
+      const fr = parseInt(document.getElementById('feelingRating').value);
+      const frText = fr <= 3 ? 'کم' : fr <= 6 ? 'متوسط' : 'زیاد';
+      
+      const vr = parseInt(document.getElementById('valuesRating')?.value || 5);
+      const vrText = vr <= 3 ? 'پایین - مغایر با ارزش‌ها' : vr <= 6 ? 'متوسط' : 'بالا - هم‌راستا';
+      
+      const haltChecks = [];
+      document.querySelectorAll('#haltCheck .checkbox-item.checked').forEach(i => {
+        haltChecks.push(i.querySelector('.checkbox-title').textContent.trim());
+      });
+      
+      const regretRadio = document.querySelector('input[name="regret"]:checked');
+      const regretVal = regretRadio ? (regretRadio.value === 'action' ? 'از انجام دادن' : regretRadio.value === 'inaction' ? 'از انجام ندادن' : 'مساوی') : 'مشخص نشده';
+      
+      const actionRadio = document.querySelector('input[name="actionType"]:checked');
+      const actionVal = actionRadio ? 
+        (actionRadio.value === 'experiment' ? 'آزمایش کوچک' : 
+         actionRadio.value === 'research' ? 'تحقیق و مشورت' : 
+         actionRadio.value === 'wait' ? 'صبر آگاهانه' : 'آماده اقدام') : 'مشخص نشده';
+
+      const riskRadio = document.querySelector('input[name="riskTolerance"]:checked');
+      const riskVal = riskRadio ? 
+        (riskRadio.value === 'low' ? 'کم' : 
+         riskRadio.value === 'medium' ? 'متوسط' : 'زیاد') : 'مشخص نشده';
+
+      const priority1 = document.querySelector('input[name="priority1"]:checked');
+      const priority2 = document.querySelector('input[name="priority2"]:checked');
+
+      const typeLabels = {
+        small: 'کوچک و برگشت‌پذیر',
+        medium: 'متوسط',
+        big: 'بزرگ و سخت‌برگشت'
+      };
+
+      let whyChain = '';
+      for (let i = 1; i <= 5; i++) {
+        const w = v('why' + i);
+        if (w) whyChain += `  چرای ${toPersian(i)}: ${w}\n`;
+      }
+
+      let summary = `گزارش تحلیل تصمیم با مدل ۱۰-۱۰-۱۰
+
+تاریخ: ${dateStr}
+ساعت: ${timeStr}
+
+
+درباره این گزارش
+
+این گزارش خروجی یک فرآیند تصمیم‌گیری ساختاریافته با مدل ۱۰-۱۰-۱۰ است.
+
+مدل اصلی سه مرحله دارد:
+- ۱۰ ثانیه: دریافت سیگنال اولیه از شهود و بدن (این داده است، نه تصمیم)
+- ۱۰ دقیقه: تحلیل منطقی، بررسی گزینه‌ها، فرض‌ها و عواقب
+- ۱۰ روز: تصمیم نهایی و برنامه اقدام
+
+برای تصمیم‌های بزرگ، تحلیل عمیق‌تر با بازه‌های ۱۰ روز، ۱۰ ماه و ۱۰ سال انجام می‌شود.
+
+نکته مهم: داده‌های این گزارش از دیدگاه من (تصمیم‌گیرنده) نوشته شده و ممکن است سوگیری داشته باشم.
+
+
+گام صفر - فریم کردن مسئله
+
+موضوع تصمیم: ${v('decisionTopic') || 'مشخص نشده'}
+نوع تصمیم: ${typeLabels[decisionType] || 'مشخص نشده'}
+
+وضعیت فعلی:
+${v('currentState') || 'نوشته نشده'}
+
+وضعیت مطلوب:
+${v('desiredState') || 'نوشته نشده'}
+
+شکاف و موانع:
+${v('gap') || 'نوشته نشده'}
+
+معیار موفقیت:
+${v('successCriteria') || 'نوشته نشده'}
+
+منابع و محدودیت‌ها:
+  زمان در هفته: ${v('timeHours') || 'مشخص نشده'} ساعت
+  بودجه: ${v('moneyAvailable') || 'مشخص نشده'}
+  مهارت‌ها: ${v('skillTags') || 'مشخص نشده'}
+  محدودیت‌ها و تعهدات: ${v('constraints') || 'مشخص نشده'}
+
+${whyChain ? `زنجیره ۵ چرا (رسیدن به ریشه):\n${whyChain}` : ''}
+
+گام یک - ۱۰ ثانیه (سیگنال شهودی)
+
+توجه: این بخش فقط سیگنال اولیه است. ممکن است از تروما، ترس یا آرزوهای غیرواقعی باشد.
+
+احساس فعلی:
+${v('currentFeeling') || 'نوشته نشده'}
+
+شدت درگیری ذهنی: ${toPersian(fr)} از ۱۰ (${frText})
+
+وضعیت HALT: ${haltChecks.length > 0 ? haltChecks.join('، ') : 'مشخص نشده'}
+
+واکنش غریزی:
+${v('gutReaction') || 'نوشته نشده'}
+`;
+
+      if (maxSteps >= 2) {
+        summary += `
+
+گام دو - ۱۰ دقیقه (تحلیل منطقی)
+
+گزینه‌ها:
+${v('options') || 'نوشته نشده'}
+
+اگر انجام بدم:
+${v('ifYes') || 'نوشته نشده'}
+
+اگر انجام ندم:
+${v('ifNo') || 'نوشته نشده'}
+
+هزینه فرصت:
+${v('opportunityCost') || 'نوشته نشده'}
+
+وکیل مدافع شیطان (استدلال علیه تصمیم):
+${v('devilAdvocate') || 'نوشته نشده'}
+
+دیدگاه بیرونی - داده‌ها و نرخ پایه:
+${v('baseRate') || 'نوشته نشده'}
+
+دیدگاه بیرونی - تجربه دیگران:
+${v('othersExperience') || 'نوشته نشده'}
+
+فرض‌های کلیدی:
+${v('keyAssumptions') || 'نوشته نشده'}
+
+چه شواهدی نظرم رو عوض می‌کنه:
+${v('falsification') || 'نوشته نشده'}
+
+چک سوگیری هزینه غرق‌شده:
+${v('sunkCostCheck') || 'نوشته نشده'}
+
+از کدوم بیشتر پشیمون می‌شم: ${regretVal}
+
+اولویت‌بندی:
+  رشد vs امنیت: ${priority1?.value || 'انتخاب نشده'}
+  آزادی vs خانواده: ${priority2?.value || 'انتخاب نشده'}
+`;
+      }
+
+      if (decisionType === 'big') {
+        summary += `
+
+تحلیل عمیق - ۱۰ روز / ۱۰ ماه / ۱۰ سال
+
+۱۰ روز بعد:
+  سودها: ${v('pros10days') || 'نوشته نشده'}
+  زیان‌ها: ${v('cons10days') || 'نوشته نشده'}
+
+۱۰ ماه بعد:
+  سودها: ${v('pros10months') || 'نوشته نشده'}
+  زیان‌ها: ${v('cons10months') || 'نوشته نشده'}
+
+۱۰ سال بعد:
+  سودها: ${v('pros10years') || 'نوشته نشده'}
+  زیان‌ها: ${v('cons10years') || 'نوشته نشده'}
+
+تأثیرات:
+  روی کار و درآمد: ${v('workImpact') || 'نوشته نشده'}
+  روی روابط: ${v('relationshipImpact') || 'نوشته نشده'}
+  روی سلامت: ${v('healthImpact') || 'نوشته نشده'}
+
+ارزش‌های مهم: ${v('values') || 'نوشته نشده'}
+هم‌راستایی با ارزش‌ها: ${toPersian(vr)} از ۱۰ (${vrText})
+
+پیش‌کالبدشکافی (چرا ممکنه شکست بخورم):
+${v('premortem') || 'نوشته نشده'}
+
+بهترین سناریو:
+${v('bestCase') || 'نوشته نشده'}
+
+بدترین سناریو:
+${v('worstCase') || 'نوشته نشده'}
+`;
+      }
+
+      if (maxSteps >= 3) {
+        summary += `
+
+گام سه - ۱۰ روز (تصمیم و اقدام)
+
+قدم بعدی: ${actionVal}
+سطح ریسک‌پذیری: ${riskVal}
+ددلاین تصمیم: ${v('decisionDeadline') || 'مشخص نشده'}
+تاریخ بازبینی: ${v('reviewDate') || 'مشخص نشده'}
+
+معیار خروج (کِی رها کنم):
+${v('killCriteria') || 'نوشته نشده'}
+
+تعهدنامه اقدام:
+  تاریخ شروع: ${v('startDate') || 'مشخص نشده'}
+  اولین قدم: ${v('firstStep') || 'مشخص نشده'}
+  اگر ${v('ifWhen') || '...'} آنگاه ${v('thenAction') || '...'}
+  گفتن به: ${v('accountability') || 'مشخص نشده'}
+`;
+      }
+
+      summary += `
+
+تصمیم نهایی:
+${v('finalDecision') || 'هنوز مشخص نشده'}
+
+
+خلاصه داده‌های کمّی
+
+- شدت درگیری ذهنی: ${toPersian(fr)} از ۱۰ (${frText})
+${decisionType === 'big' ? `- هم‌راستایی با ارزش‌ها: ${toPersian(vr)} از ۱۰ (${vrText})` : ''}
+${maxSteps >= 2 ? `- پشیمانی بیشتر از: ${regretVal}` : ''}
+${maxSteps >= 3 ? `- سطح ریسک‌پذیری: ${riskVal}` : ''}
+- نوع تصمیم: ${typeLabels[decisionType] || 'مشخص نشده'}
+- مراحل طی‌شده: ${toPersian(maxSteps)} از ۳
+
+
+انتظار من از تحلیلگر:
+${v('expectations') || 'مشخص نشده'}
+
+
+دستورالعمل برای هوش مصنوعی / مشاور
+
+نقش تو: یک متخصص تصمیم‌گیری و مشاور انتقادی. وظیفه تو تأیید من نیست، بلکه کمک به دیدن نقاط کور است.
+
+لطفاً این تحلیل را انجام بده:
+
+۱. فریم مسئله: آیا مسئله رو درست تعریف کردم؟ کجاش مبهم یا اشتباهه؟
+
+۲. نقاط کور: با توجه به داده‌ها، چه فرضیات پنهانی دارم که خودم ندیدم؟
+
+۳. سوگیری‌ها: کدوم سوگیری‌های شناختی رو تو متن می‌بینی؟ (مثل تأیید، هزینه غرق‌شده، خوش‌بینی بیش‌ازحد)
+
+۴. مقایسه احساسی و منطقی: تحلیل احساسی من (بخش ۱۰ ثانیه) با تحلیل منطقی (بخش ۱۰ دقیقه) هم‌خوانی داره یا تضاد؟
+
+۵. تست فرض‌ها: برای هر فرض کلیدی، چطور می‌تونم تستش کنم؟
+
+۶. ریسک‌های پنهان: ۳ تا ۵ ریسک مهم که از متن می‌فهمی و برای هر کدوم:
+   - چقدر محتمله (کم/متوسط/زیاد)
+   - چقدر شدیده (کم/متوسط/زیاد)
+
+۷. فرصت‌های نادیده: چه فرصت‌هایی رو ندیدم؟
+
+۸. گزینه‌های جایگزین: ۲-۳ گزینه پیشنهاد بده که ننوشتم.
+
+۹. چالش پیش‌کالبدشکافی: ۳ سناریوی شکست دیگه که نادیده گرفتم.
+
+۱۰. استنباط اولویت ارزش‌ها: از روی داده‌ها، اولویت واقعی من چیه؟
+
+۱۱. اگه جای من بودی چیکار می‌کردی؟ (با دلیل)
+
+۱۲. پیشنهاد عملی ۳۰ روزه: یک برنامه عملی که شانس موفقیت رو بالا ببره.
+
+محدودیت‌ها:
+- از توصیه قطعی («حتماً این کار رو بکن») خودداری کن
+- اگر اطلاعات کافی نیست، بگو چه اطلاعاتی لازمه
+- صادق و انتقادی باش، نه تأییدکننده
+- پاسخ رو در حداکثر ۱۰۰۰ کلمه نگه دار
+
+
+این گزارش با ابزار تصمیم‌گیری ۱۰-۱۰-۱۰ ساخته شده
+${dateStr}`;
+
+      return summary;
+    }
+
+    // Save to localStorage
+    window.addEventListener('beforeunload', () => {
+      try {
+        const json = buildDecisionJSON();
+        localStorage.setItem('lastDecision', JSON.stringify(json));
+      } catch(e) {}
+    });
+
+    updateProgress();
+  </script>
 </body>
 </html>
