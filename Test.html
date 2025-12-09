@@ -37,6 +37,58 @@
       --radius-sm: 8px;
       --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
       --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --brightness: 1;
+    }
+
+    /* حالت روز (Light Mode) */
+    body.light-mode {
+      --bg: #f8fafc;
+      --bg-card: rgba(255, 255, 255, 0.95);
+      --bg-input: rgba(241, 245, 249, 0.9);
+      --text: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border: rgba(100, 116, 139, 0.2);
+      --border-hover: rgba(100, 116, 139, 0.35);
+      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      --accent-soft: rgba(99, 102, 241, 0.1);
+      --green-soft: rgba(16, 185, 129, 0.1);
+      --orange-soft: rgba(245, 158, 11, 0.1);
+      --red-soft: rgba(239, 68, 68, 0.1);
+      --purple-soft: rgba(168, 85, 247, 0.1);
+      --cyan-soft: rgba(6, 182, 212, 0.1);
+    }
+
+    body.light-mode::before {
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.08), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(168, 85, 247, 0.05), transparent);
+    }
+
+    /* حالت سپیا (مناسب مطالعه) */
+    body.sepia-mode {
+      --bg: #f4f1ea;
+      --bg-card: rgba(250, 247, 240, 0.98);
+      --bg-input: rgba(240, 235, 225, 0.9);
+      --text: #433422;
+      --text-secondary: #5c4a35;
+      --text-muted: #7a6550;
+      --border: rgba(90, 70, 50, 0.15);
+      --border-hover: rgba(90, 70, 50, 0.25);
+      --shadow: 0 25px 50px -12px rgba(50, 40, 30, 0.12);
+      --accent: #8b6914;
+      --accent-soft: rgba(139, 105, 20, 0.12);
+    }
+
+    body.sepia-mode::before {
+      background: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 105, 20, 0.06), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(100, 80, 50, 0.04), transparent);
+    }
+
+    /* فیلتر روشنایی */
+    body {
+      filter: brightness(var(--brightness));
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1107,9 +1159,193 @@
       .progress-step { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
       .resources-grid { grid-template-columns: 1fr; }
     }
+
+    /* کنترل‌های تم و نور */
+    .theme-controls {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .theme-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .theme-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .brightness-control {
+      position: fixed;
+      top: 1rem;
+      left: 4rem;
+      z-index: 1000;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1rem;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 180px;
+    }
+
+    .brightness-control.show {
+      display: flex;
+    }
+
+    .brightness-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .brightness-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(to right, #374151, #fbbf24, #ffffff);
+    }
+
+    .brightness-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--accent);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .theme-menu {
+      position: fixed;
+      top: 4rem;
+      left: 1rem;
+      z-index: 1000;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.5rem;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      display: none;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 160px;
+    }
+
+    .theme-menu.show {
+      display: flex;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: right;
+    }
+
+    .theme-option:hover {
+      background: var(--accent-soft);
+    }
+
+    .theme-option.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .theme-option-icon {
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 640px) {
+      .theme-controls {
+        top: 0.5rem;
+        left: 0.5rem;
+      }
+      .theme-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+      }
+      .brightness-control {
+        left: 3rem;
+        min-width: 150px;
+      }
+      .theme-menu {
+        top: 3rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- کنترل‌های تم و نور -->
+  <div class="theme-controls">
+    <button class="theme-btn" id="themeToggle" title="تغییر تم">🌓</button>
+    <button class="theme-btn" id="brightnessToggle" title="تنظیم روشنایی">☀️</button>
+  </div>
+
+  <div class="theme-menu" id="themeMenu">
+    <button class="theme-option active" data-theme="dark">
+      <span class="theme-option-icon">🌙</span>
+      <span>حالت شب</span>
+    </button>
+    <button class="theme-option" data-theme="light">
+      <span class="theme-option-icon">☀️</span>
+      <span>حالت روز</span>
+    </button>
+    <button class="theme-option" data-theme="sepia">
+      <span class="theme-option-icon">📖</span>
+      <span>مناسب مطالعه</span>
+    </button>
+  </div>
+
+  <div class="brightness-control" id="brightnessControl">
+    <div class="brightness-label">
+      <span>💡</span>
+      <span>روشنایی صفحه</span>
+    </div>
+    <input type="range" min="50" max="120" value="100" class="brightness-slider" id="brightnessSlider" />
+  </div>
+
   <div class="container">
     <header>
       <div class="logo">
@@ -2410,6 +2646,80 @@ ${dateStr}`;
     });
 
     updateProgress();
+
+    // === تنظیمات تم و روشنایی ===
+    const themeToggle = document.getElementById('themeToggle');
+    const themeMenu = document.getElementById('themeMenu');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const brightnessToggle = document.getElementById('brightnessToggle');
+    const brightnessControl = document.getElementById('brightnessControl');
+    const brightnessSlider = document.getElementById('brightnessSlider');
+
+    // بارگذاری تنظیمات ذخیره‌شده
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedBrightness = localStorage.getItem('brightness') || '100';
+
+    function setTheme(theme) {
+      document.body.classList.remove('light-mode', 'sepia-mode');
+      if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        themeToggle.textContent = '☀️';
+      } else if (theme === 'sepia') {
+        document.body.classList.add('sepia-mode');
+        themeToggle.textContent = '📖';
+      } else {
+        themeToggle.textContent = '🌙';
+      }
+      
+      themeOptions.forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.theme === theme);
+      });
+      
+      localStorage.setItem('theme', theme);
+    }
+
+    function setBrightness(value) {
+      document.documentElement.style.setProperty('--brightness', value / 100);
+      localStorage.setItem('brightness', value);
+    }
+
+    // اعمال تنظیمات ذخیره‌شده
+    setTheme(savedTheme);
+    setBrightness(savedBrightness);
+    brightnessSlider.value = savedBrightness;
+
+    // رویدادها
+    themeToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      themeMenu.classList.toggle('show');
+      brightnessControl.classList.remove('show');
+    });
+
+    themeOptions.forEach(opt => {
+      opt.addEventListener('click', () => {
+        setTheme(opt.dataset.theme);
+        themeMenu.classList.remove('show');
+      });
+    });
+
+    brightnessToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      brightnessControl.classList.toggle('show');
+      themeMenu.classList.remove('show');
+    });
+
+    brightnessSlider.addEventListener('input', function() {
+      setBrightness(this.value);
+    });
+
+    // بستن منوها با کلیک بیرون
+    document.addEventListener('click', () => {
+      themeMenu.classList.remove('show');
+      brightnessControl.classList.remove('show');
+    });
+
+    themeMenu.addEventListener('click', e => e.stopPropagation());
+    brightnessControl.addEventListener('click', e => e.stopPropagation());
   </script>
 </body>
 </html>
