@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه‌ساز ۴ روزه | نسخه بهینه</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Vazirmatn', sans-serif; }
+        
+        body {
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(20px);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .gradient-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+        }
+        
+        .input-field {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .input-field:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        }
+        
+        .option-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .option-card:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .option-card.selected {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: transparent;
+            color: white;
+        }
+        
+        .option-card.selected .text-gray-500 {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .energy-track {
+            background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .energy-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 4px solid #10b981;
+        }
+        
+        .prompt-box {
+            background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+            font-family: 'Vazirmatn', monospace;
+        }
+        
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: #10b981;
+            transform: scale(1.4);
+        }
+        
+        .step-indicator.completed {
+            background: #10b981;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 3px; }
+        
+        .emoji-btn {
+            transition: all 0.2s;
+        }
+        
+        .emoji-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .emoji-btn.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px #10b981;
+        }
+        
+        .tip-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4">
+    
+    <!-- Header -->
+    <header class="text-center mb-6 fade-in">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-400 to-green-600 mb-4 shadow-lg">
+            <span class="text-4xl">🎯</span>
+        </div>
+        <h1 class="text-2xl font-bold text-white mb-2">برنامه‌ساز ۴ روزه</h1>
+        <p class="text-gray-400 text-sm">فقط ۵ سوال ساده، کمتر از ۱ دقیقه ⚡</p>
+    </header>
+
+    <!-- Progress - 5 Steps -->
+    <div class="max-w-lg mx-auto mb-6">
+        <div class="flex justify-between items-center px-6">
+            <div class="step-indicator active w-3 h-3 rounded-full bg-gray-600" data-step="1"></div>
+            <div class="flex-1 h-1 bg-gray-700 mx-2"><div class="progress-bar h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div></div>
+            <div class="step-indicator w-3 h-3 rounded-full bg-gray-600" data-step="2"></div>
+            <div class="flex-1 h-1 bg-gray-700 mx-2"><div class="progress-bar h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div></div>
+            <div class="step-indicator w-3 h-3 rounded-full bg-gray-600" data-step="3"></div>
+            <div class="flex-1 h-1 bg-gray-700 mx-2"><div class="progress-bar h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div></div>
+            <div class="step-indicator w-3 h-3 rounded-full bg-gray-600" data-step="4"></div>
+            <div class="flex-1 h-1 bg-gray-700 mx-2"><div class="progress-bar h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div></div>
+            <div class="step-indicator w-3 h-3 rounded-full bg-gray-600" data-step="5"></div>
+        </div>
+        <div class="text-center mt-3">
+            <span class="text-gray-500 text-sm">مرحله <span id="currentStepNum" class="text-emerald-400 font-bold text-lg">۱</span> از ۵</span>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <main class="max-w-lg mx-auto">
+        
+        <div id="formCard" class="glass rounded-3xl card-shadow overflow-hidden">
+            
+            <!-- Step 1: Goal - Simple & Quick -->
+            <div class="step fade-in p-6" data-step="1">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">🎯</span>
+                    <h2 class="text-xl font-bold text-gray-800">هدف ۴ روز آینده</h2>
+                    <p class="text-gray-500 text-sm mt-1">یه چیز کوچیک و مشخص</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <input type="text" id="goal" class="input-field w-full px-4 py-4 rounded-xl focus:outline-none text-lg" placeholder="مثلاً: روزی ۱۵ دقیقه مطالعه...">
+                    
+                    <!-- Quick Goal Buttons -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" class="goal-btn option-card p-3 rounded-xl text-center">
+                            <span class="text-2xl block mb-1">📚</span>
+                            <span class="text-sm font-medium">مطالعه</span>
+                        </button>
+                        <button type="button" class="goal-btn option-card p-3 rounded-xl text-center">
+                            <span class="text-2xl block mb-1">🏃</span>
+                            <span class="text-sm font-medium">ورزش</span>
+                        </button>
+                        <button type="button" class="goal-btn option-card p-3 rounded-xl text-center">
+                            <span class="text-2xl block mb-1">💼</span>
+                            <span class="text-sm font-medium">کار متمرکز</span>
+                        </button>
+                        <button type="button" class="goal-btn option-card p-3 rounded-xl text-center">
+                            <span class="text-2xl block mb-1">🧹</span>
+                            <span class="text-sm font-medium">نظم خونه</span>
+                        </button>
+                    </div>
+                    
+                    <div class="info-box rounded-xl p-3 text-center">
+                        <p class="text-blue-800 text-xs">💡 خالی بذاری هم اشکال نداره، یه هدف پیش‌فرض انتخاب میشه</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Energy + Mood Combined -->
+            <div class="step hidden p-6" data-step="2">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">⚡</span>
+                    <h2 class="text-xl font-bold text-gray-800">انرژی و حالت</h2>
+                    <p class="text-gray-500 text-sm mt-1">الان چطوری؟</p>
+                </div>
+                
+                <!-- Energy Slider -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-3">سطح انرژی امروزت؟</label>
+                    <div class="relative mb-3">
+                        <div class="energy-track"></div>
+                        <input type="range" id="energy" min="1" max="10" value="5" class="energy-thumb absolute top-0 left-0 w-full h-2.5 appearance-none bg-transparent cursor-pointer">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-400 text-sm">😴 کم</span>
+                        <span class="text-3xl font-bold text-emerald-600" id="energyValue">۵</span>
+                        <span class="text-gray-400 text-sm">🔥 زیاد</span>
+                    </div>
+                </div>
+                
+                <!-- Mood - Simplified to 4 options -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-3">حال روحیت؟</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button type="button" class="mood-btn emoji-btn py-4 rounded-xl bg-gray-100 text-2xl flex flex-col items-center" data-mood="عالی">
+                            😊
+                            <span class="text-xs mt-1 text-gray-600">عالی</span>
+                        </button>
+                        <button type="button" class="mood-btn emoji-btn py-4 rounded-xl bg-gray-100 text-2xl flex flex-col items-center" data-mood="معمولی">
+                            😐
+                            <span class="text-xs mt-1 text-gray-600">معمولی</span>
+                        </button>
+                        <button type="button" class="mood-btn emoji-btn py-4 rounded-xl bg-gray-100 text-2xl flex flex-col items-center selected" data-mood="خسته">
+                            😔
+                            <span class="text-xs mt-1 text-gray-600">خسته</span>
+                        </button>
+                        <button type="button" class="mood-btn emoji-btn py-4 rounded-xl bg-gray-100 text-2xl flex flex-col items-center" data-mood="استرسی">
+                            😰
+                            <span class="text-xs mt-1 text-gray-600">استرسی</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Time - Simplified -->
+            <div class="step hidden p-6" data-step="3">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">⏰</span>
+                    <h2 class="text-xl font-bold text-gray-800">زمان</h2>
+                    <p class="text-gray-500 text-sm mt-1">کِی و چقدر وقت داری؟</p>
+                </div>
+                
+                <!-- Available Time -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-3">وقت آزاد روزانه؟</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="time" value="کم" class="hidden peer">
+                            <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🐢</span>
+                                <span class="text-sm font-medium">کم</span>
+                                <span class="text-xs text-gray-500 block">۳۰-۴۵ دقیقه</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="time" value="متوسط" class="hidden peer" checked>
+                            <div class="option-card selected peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🚶</span>
+                                <span class="text-sm font-medium">متوسط</span>
+                                <span class="text-xs text-gray-500 block">۱-۲ ساعت</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="time" value="زیاد" class="hidden peer">
+                            <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🚀</span>
+                                <span class="text-sm font-medium">زیاد</span>
+                                <span class="text-xs text-gray-500 block">۲+ ساعت</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Peak Hour - Simplified to 3 options -->
+                <div>
+                    <label class="block text-gray-700 font-medium mb-3">بهترین ساعت تمرکزت؟</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="peak" value="صبح" class="hidden peer">
+                            <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🌅</span>
+                                <span class="text-sm">صبح</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="peak" value="عصر" class="hidden peer" checked>
+                            <div class="option-card selected peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🌤️</span>
+                                <span class="text-sm">عصر</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="peak" value="شب" class="hidden peer">
+                            <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                                <span class="text-2xl block mb-1">🌙</span>
+                                <span class="text-sm">شب</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Barrier - Single Question -->
+            <div class="step hidden p-6" data-step="4">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">🚧</span>
+                    <h2 class="text-xl font-bold text-gray-800">مانع اصلی</h2>
+                    <p class="text-gray-500 text-sm mt-1">چی معمولاً جلوت رو می‌گیره؟</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="barrier" value="گوشی" class="hidden peer" checked>
+                        <div class="option-card selected peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">📱</span>
+                            <span class="font-medium">گوشی</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="barrier" value="خستگی" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">😴</span>
+                            <span class="font-medium">خستگی</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="barrier" value="حواس‌پرتی" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">🦋</span>
+                            <span class="font-medium">حواس‌پرتی</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="barrier" value="بی‌حوصلگی" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">😑</span>
+                            <span class="font-medium">بی‌حوصلگی</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="tip-box rounded-xl p-3 mt-4 text-center">
+                    <p class="text-amber-800 text-sm">💡 AI یه راه‌حل If-Then مخصوص این مانع بهت میده</p>
+                </div>
+            </div>
+
+            <!-- Step 5: Reward - Simple -->
+            <div class="step hidden p-6" data-step="5">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">🎁</span>
+                    <h2 class="text-xl font-bold text-gray-800">پاداش</h2>
+                    <p class="text-gray-500 text-sm mt-1">بعد از انجام کار چی به خودت میدی؟</p>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="چای/قهوه" class="hidden peer" checked>
+                        <div class="option-card selected peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">☕</span>
+                            <span class="text-sm">چای/قهوه</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="استراحت" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">😌</span>
+                            <span class="text-sm">استراحت</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="تفریح" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">🎮</span>
+                            <span class="text-sm">تفریح</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="تنقلات" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">🍫</span>
+                            <span class="text-sm">تنقلات</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="موسیقی" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">🎵</span>
+                            <span class="text-sm">موسیقی</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="reward" value="قدم زدن" class="hidden peer">
+                        <div class="option-card peer-checked:selected p-4 rounded-xl text-center">
+                            <span class="text-3xl block mb-2">🚶</span>
+                            <span class="text-sm">قدم زدن</span>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Ready Message -->
+                <div class="bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300 rounded-xl p-4 text-center">
+                    <p class="text-emerald-800 font-bold text-lg mb-1">
+                        ✨ آماده‌ای!
+                    </p>
+                    <p class="text-emerald-700 text-sm">
+                        دکمه «ساخت برنامه» رو بزن و برنامه ۴ روزه‌ات رو بگیر
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex gap-3 mt-5 px-2">
+            <button id="prevBtn" class="hidden flex-1 py-4 px-6 bg-white/10 hover:bg-white/20 text-white font-medium rounded-2xl transition-all text-lg">
+                → قبلی
+            </button>
+            <button id="nextBtn" class="flex-1 gradient-btn py-4 px-6 text-white font-bold rounded-2xl text-lg">
+                بعدی ←
+            </button>
+            <button id="generateBtn" class="hidden flex-1 gradient-btn py-4 px-6 text-white font-bold rounded-2xl text-lg">
+                ✨ ساخت برنامه
+            </button>
+        </div>
+
+        <!-- Result -->
+        <div id="resultSection" class="hidden slide-up mt-6">
+            <div class="glass rounded-3xl card-shadow p-6">
+                <div class="text-center mb-5">
+                    <span class="text-5xl mb-3 block">🎉</span>
+                    <h2 class="text-xl font-bold text-gray-800">پرامپت آماده‌ست!</h2>
+                    <p class="text-gray-500 text-sm">کپی کن و بده به ChatGPT یا Claude</p>
+                </div>
+                
+                <div class="prompt-box rounded-2xl p-4 mb-5 max-h-72 overflow-y-auto border border-emerald-500/30">
+                    <pre id="promptOutput" class="text-emerald-400 text-xs leading-relaxed whitespace-pre-wrap"></pre>
+                </div>
+                
+                <div class="flex gap-3 mb-5">
+                    <button id="copyBtn" class="flex-1 gradient-btn py-4 px-6 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-lg">
+                        <span>📋</span>
+                        <span>کپی کن</span>
+                    </button>
+                    <button id="resetBtn" class="py-4 px-5 bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold rounded-2xl transition-all">
+                        🔄
+                    </button>
+                </div>
+                
+                <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                    <p class="text-emerald-800 font-bold text-sm mb-2">📝 مراحل بعدی:</p>
+                    <ol class="text-emerald-700 text-sm space-y-1">
+                        <li>۱. کپی کن</li>
+                        <li>۲. برو ChatGPT یا Claude</li>
+                        <li>۳. Paste کن</li>
+                        <li>۴. برنامه ۴ روزه‌ات رو بگیر! 🚀</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Save Indicator -->
+        <div id="saveIndicator" class="fixed bottom-4 left-4 bg-gray-900/90 text-white px-4 py-2 rounded-full text-sm flex items-center gap-2 opacity-0 transition-all duration-300">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+            ذخیره شد
+        </div>
+
+    </main>
+
+    <script>
+        // ==================== State ====================
+        const state = {
+            currentStep: 1,
+            totalSteps: 5,
+            data: {
+                goal: '',
+                energy: 5,
+                mood: 'خسته',
+                time: 'متوسط',
+                peak: 'عصر',
+                barrier: 'گوشی',
+                reward: 'چای/قهوه'
+            }
+        };
+
+        // Default goals
+        const defaultGoals = [
+            'روزی ۱۵ دقیقه مطالعه',
+            'روزی ۱۰ دقیقه ورزش سبک',
+            'روزی ۳۰ دقیقه کار متمرکز',
+            'روزی ۱۵ دقیقه نظم خونه'
+        ];
+        
+        // Goal mappings
+        const goalMappings = {
+            '📚': 'روزی ۱۵ دقیقه مطالعه',
+            '🏃': 'روزی ۱۰ دقیقه ورزش',
+            '💼': 'روزی ۳۰ دقیقه کار متمرکز',
+            '🧹': 'روزی ۱۵ دقیقه نظم خونه'
+        };
+
+        // ==================== Persian Numbers ====================
+        const toPersian = (num) => {
+            const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹', '۱۰'];
+            return persianDigits[num] || String(num).replace(/\d/g, d => persianDigits[d]);
+        };
+
+        // ==================== DOM ====================
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        // ==================== LocalStorage ====================
+        const storage = {
+            save() {
+                localStorage.setItem('planner_v6', JSON.stringify({ ...state.data, step: state.currentStep, ts: Date.now() }));
+                $('#saveIndicator').classList.remove('opacity-0');
+                setTimeout(() => $('#saveIndicator').classList.add('opacity-0'), 1500);
+            },
+            load() {
+                const saved = localStorage.getItem('planner_v6');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        if (Date.now() - data.ts < 86400000) {
+                            Object.assign(state.data, data);
+                            state.currentStep = data.step || 1;
+                            return true;
+                        }
+                    } catch (e) {}
+                }
+                return false;
+            },
+            clear() {
+                localStorage.removeItem('planner_v6');
+            }
+        };
+
+        // ==================== UI ====================
+        function updateProgress() {
+            $$('.step-indicator').forEach((ind, i) => {
+                ind.classList.remove('active', 'completed');
+                if (i + 1 < state.currentStep) ind.classList.add('completed');
+                else if (i + 1 === state.currentStep) ind.classList.add('active');
+            });
+            
+            $$('.progress-bar').forEach((bar, i) => {
+                bar.style.width = i < state.currentStep - 1 ? '100%' : '0%';
+            });
+            
+            $('#currentStepNum').textContent = toPersian(state.currentStep);
+        }
+
+        function showStep(step) {
+            $$('.step').forEach(s => s.classList.add('hidden'));
+            const target = $(`.step[data-step="${step}"]`);
+            target.classList.remove('hidden');
+            target.classList.add('fade-in');
+            
+            $('#prevBtn').classList.toggle('hidden', step === 1);
+            $('#nextBtn').classList.toggle('hidden', step === state.totalSteps);
+            $('#generateBtn').classList.toggle('hidden', step !== state.totalSteps);
+            
+            updateProgress();
+        }
+
+        function updateOptionCards(name) {
+            const container = $(`input[name="${name}"]`)?.closest('.step');
+            if (!container) return;
+            container.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                const card = input.closest('label')?.querySelector('.option-card');
+                if (card) {
+                    card.classList.toggle('selected', input.checked);
+                }
+            });
+        }
+
+        function collectData() {
+            state.data.goal = $('#goal').value.trim();
+            state.data.energy = parseInt($('#energy').value);
+            
+            ['time', 'peak', 'barrier', 'reward'].forEach(name => {
+                const checked = $(`input[name="${name}"]:checked`);
+                if (checked) state.data[name] = checked.value;
+            });
+        }
+
+        function restoreUI() {
+            if (state.data.goal) $('#goal').value = state.data.goal;
+            
+            $('#energy').value = state.data.energy;
+            $('#energyValue').textContent = toPersian(state.data.energy);
+            
+            $$('.mood-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.mood === state.data.mood);
+            });
+            
+            ['time', 'peak', 'barrier', 'reward'].forEach(name => {
+                const radio = $(`input[name="${name}"][value="${state.data[name]}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    updateOptionCards(name);
+                }
+            });
+        }
+
+        // ==================== Prompt Generator ====================
+        function generatePrompt() {
+            collectData();
+            const d = state.data;
+            
+            // Use default goal if empty
+            const goal = d.goal || defaultGoals[Math.floor(Math.random() * defaultGoals.length)];
+            
+            // Energy-based settings
+            let taskDuration, taskCount, mode;
+            if (d.energy <= 3) {
+                taskDuration = '۵ دقیقه';
+                taskCount = '۱';
+                mode = 'اضطراری';
+            } else if (d.energy <= 6) {
+                taskDuration = '۱۰ دقیقه';
+                taskCount = '۲';
+                mode = 'سبک';
+            } else {
+                taskDuration = '۱۵ دقیقه';
+                taskCount = '۳';
+                mode = 'عادی';
+            }
+            
+            // Time adjustment
+            if (d.time === 'کم') taskCount = '۱';
+            else if (d.time === 'زیاد' && d.energy > 5) taskCount = '۳';
+
+            // Barrier solutions
+            const barrierSolutions = {
+                'گوشی': 'گوشی رو ببر اتاق دیگه + تایمر ۵ دقیقه بذار',
+                'خستگی': '۳ نفس عمیق + نسخه ۲ دقیقه‌ای انجام بده',
+                'حواس‌پرتی': 'بگو «فقط ۳۰ ثانیه» + فوری شروع کن',
+                'بی‌حوصلگی': '۱ دقیقه موسیقی گوش بده + تایمر ۵ دقیقه'
+            };
+            
+            // Mood solutions
+            const moodSolutions = {
+                'عالی': 'ادامه بده! بهترین زمانه',
+                'معمولی': 'با یه کار کوچیک شروع کن',
+                'خسته': '۳ نفس عمیق + نسخه ۵ دقیقه‌ای',
+                'استرسی': 'تنفس ۴-۲-۶ + شروع ۳۰ ثانیه‌ای'
+            };
+
+            return `# 🎯 برنامه‌ریزی ۴ روزه — نسخه ساده
+
+## ⚠️ نکته مهم برای AI
+
+این کاربر:
+- تازه می‌خواد برنامه‌ریزی رو شروع کنه
+- به برنامه‌های **خیلی ساده و کوچک** نیاز داره
+- اگه برنامه سنگین بدی، شکست می‌خوره
+
+✅ قانون طلایی: **کوچک‌تر = بهتر**
+
+---
+
+## 📊 اطلاعات کاربر
+
+| آیتم | مقدار |
+|------|-------|
+| 🎯 هدف ۴ روزه | ${goal} |
+| ⚡ سطح انرژی | ${toPersian(d.energy)}/۱۰ |
+| 😊 حال روحی | ${d.mood} |
+| ⏰ وقت آزاد | ${d.time} |
+| 🌟 ساعت طلایی | ${d.peak} |
+| 🚧 مانع اصلی | ${d.barrier} |
+| 🎁 پاداش | ${d.reward} |
+
+---
+
+## ⚙️ تنظیمات خودکار (بر اساس انرژی ${toPersian(d.energy)})
+
+| تنظیم | مقدار |
+|-------|-------|
+| حالت برنامه | ${mode} |
+| تعداد کار روزانه | حداکثر ${taskCount} |
+| مدت هر کار | ${taskDuration} |
+
+---
+
+## 📋 ۱۰ قانون برای AI
+
+1. هر روز **حداکثر ${taskCount} کار** — نه بیشتر!
+2. هر کار **حداکثر ${taskDuration}**
+3. همه کارها **رفتارمحور** باشن (مثال: «۱۰ دقیقه صفحه ۵-۱۵ کتاب» نه «مطالعه کنم»)
+4. همیشه **نسخه اضطراری ۵ دقیقه‌ای** بده
+5. همیشه **If-Then** برای مانع «${d.barrier}» بنویس
+6. **روتین شروع ۱ دقیقه‌ای** بده
+7. بعد از هر کار، پاداش: **${d.reward}**
+8. اگه ۲ روز شکست خورد → برنامه رو **۵۰٪ ساده‌تر** کن
+9. **جملات انگیزشی** کوتاه و ساده باشن
+10. **چک‌لیست شبانه ۳۰ ثانیه‌ای** بده
+
+---
+
+## 📤 فرمت خروجی
+
+### ۱) ۳ قانون طلایی شخصی
+مثال:
+- «کامل نباش، فقط شروع کن»
+- «۵ دقیقه بهتر از صفره»
+- «گیر کردی؟ برو نسخه اضطراری»
+
+### ۲) روتین شروع ۱ دقیقه‌ای
+\`\`\`
+۱. یه لیوان آب (۱۵ ثانیه)
+۲. ۳ نفس عمیق (۱۵ ثانیه)
+۳. تایمر رو بذار (۱۵ ثانیه)
+۴. شروع کن! (۱۵ ثانیه)
+\`\`\`
+
+### ۳) برنامه ۴ روزه
+برای هر روز:
+\`\`\`
+📅 روز [شماره]
+
+⏰ ساعت شروع: ${d.peak}
+🚀 روتین شروع: [خلاصه]
+
+🧩 کارها:
+   ۱. [کار] (${taskDuration})
+   ۲. [کار اختیاری] (${taskDuration})
+
+🎁 پاداش: ${d.reward}
+
+📊 امتیاز: _/۳
+   □ شروع کردم؟
+   □ کار اصلی شد؟
+   □ حداقل ۵ دقیقه کار کردم؟
+\`\`\`
+
+### ۴) نسخه اضطراری ۵ دقیقه‌ای
+\`\`\`
+وقتی اصلاً حال نداری:
+۱. یک لیوان آب (۱ دقیقه)
+۲. ۳ نفس عمیق (۱ دقیقه)
+۳. فقط ۳ دقیقه کار خیلی کوچیک
+→ تموم! امروز موفق بودی 🎉
+\`\`\`
+
+### ۵) If-Then برای «${d.barrier}»
+\`\`\`
+اگر ${d.barrier} اتفاق افتاد:
+→ ${barrierSolutions[d.barrier]}
+→ اگر نشد: برو نسخه اضطراری
+\`\`\`
+
+### ۶) راهکار برای حال «${d.mood}»
+→ ${moodSolutions[d.mood]}
+
+### ۷) چک‌لیست شبانه (۳۰ ثانیه)
+\`\`\`
+□ امروز چند امتیاز گرفتم؟ _/۳
+□ یه چیز خوب امروز؟ ___
+□ فردا چی رو بهتر می‌کنم؟ ___
+\`\`\`
+
+### ۸) کارت ریست (وقتی روز خراب شد)
+\`\`\`
+۱. ۳۰ ثانیه نفس عمیق
+۲. یه لیوان آب
+۳. تصمیم: [ادامه] یا [نسخه اضطراری] یا [فردا]
+→ هر تصمیمی درسته!
+\`\`\`
+
+---
+
+## 🎯 تعریف موفقیت
+
+موفقیت = ۴ روز پشت سر هم، **حداقل ۵ دقیقه** کار مرتبط با هدف انجام بشه
+
+شکست = برنامه سنگین + انتظار کمال‌گرایی
+
+---
+
+⏳ لطفاً برنامه ۴ روزه‌ام رو بساز!`;
+        }
+
+        // ==================== Events ====================
+        
+        // Energy slider
+        $('#energy').addEventListener('input', (e) => {
+            $('#energyValue').textContent = toPersian(e.target.value);
+            state.data.energy = parseInt(e.target.value);
+            storage.save();
+        });
+        
+        // Mood buttons
+        $$('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.mood-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                state.data.mood = btn.dataset.mood;
+                storage.save();
+            });
+        });
+        
+        // Goal input
+        $('#goal').addEventListener('input', () => {
+            state.data.goal = $('#goal').value;
+            storage.save();
+        });
+        
+        // Goal buttons
+        $$('.goal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $$('.goal-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                const emoji = btn.querySelector('span').textContent;
+                const goalText = goalMappings[emoji] || '';
+                $('#goal').value = goalText;
+                state.data.goal = goalText;
+                storage.save();
+            });
+        });
+        
+        // Radio buttons
+        $$('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                updateOptionCards(e.target.name);
+                state.data[e.target.name] = e.target.value;
+                storage.save();
+            });
+        });
+        
+        // Navigation
+        $('#nextBtn').addEventListener('click', () => {
+            collectData();
+            storage.save();
+            state.currentStep++;
+            showStep(state.currentStep);
+        });
+        
+        $('#prevBtn').addEventListener('click', () => {
+            state.currentStep--;
+            showStep(state.currentStep);
+        });
+        
+        // Generate
+        $('#generateBtn').addEventListener('click', () => {
+            const prompt = generatePrompt();
+            $('#promptOutput').textContent = prompt;
+            $('#formCard').classList.add('hidden');
+            $('#prevBtn').classList.add('hidden');
+            $('#generateBtn').classList.add('hidden');
+            $('#resultSection').classList.remove('hidden');
+            storage.clear();
+        });
+        
+        // Copy
+        $('#copyBtn').addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText($('#promptOutput').textContent);
+                $('#copyBtn').innerHTML = '<span>✅</span><span>کپی شد!</span>';
+                setTimeout(() => {
+                    $('#copyBtn').innerHTML = '<span>📋</span><span>کپی کن</span>';
+                }, 2000);
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = $('#promptOutput').textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                $('#copyBtn').innerHTML = '<span>✅</span><span>کپی شد!</span>';
+                setTimeout(() => {
+                    $('#copyBtn').innerHTML = '<span>📋</span><span>کپی کن</span>';
+                }, 2000);
+            }
+        });
+        
+        // Reset
+        $('#resetBtn').addEventListener('click', () => {
+            if (confirm('از اول شروع کنیم؟')) {
+                location.reload();
+            }
+        });
+        
+        // ==================== Init ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            if (storage.load()) {
+                restoreUI();
+            }
+            showStep(state.currentStep);
+        });
+    </script>
+</body>
+</html>
