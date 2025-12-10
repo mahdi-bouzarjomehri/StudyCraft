@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>الان چیکار کنم؟ — اپ شروع برنامه‌ریزی (Mobile)</title>
+
+  <!-- Tailwind CDN (mobile-first utilities) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent: #06b6a4; /* teal-400 */
+      --accent-600: #059669;
+      --bg-dark: #071129;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Vazirmatn", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#071029 0%, #0b1220 60%);
+      color: #0b1220;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      padding:18px;
+    }
+
+    /* Mobile container */
+    .app {
+      width:100%;
+      max-width:460px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+      border-radius:18px;
+      box-shadow: 0 20px 60px rgba(2,6,23,0.7);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-height:640px;
+    }
+
+    /* Header */
+    .app-header{
+      padding:16px;
+      background: linear-gradient(90deg,var(--accent),var(--accent-600));
+      color:white;
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;background:rgba(255,255,255,0.12)
+    }
+
+    /* Content */
+    .app-body{padding:14px;flex:1;overflow:auto}
+    .step-card{
+      background: linear-gradient(180deg, #ffffff, #fbfbff);
+      border-radius:14px;
+      padding:14px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+    }
+
+    /* Progress */
+    .progress-track{height:8px;background:#e6eef8;border-radius:999px;overflow:hidden}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-600));width:0%;transition:width .35s ease}
+
+    /* Inputs */
+    .input-field{border:1px solid #e6eef8;padding:12px;border-radius:12px;width:100%;background:transparent;font-size:15px}
+    .option {border:1px solid #e6eef8;border-radius:12px;padding:12px;text-align:center;cursor:pointer}
+    .option.selected{background:linear-gradient(90deg,var(--accent),var(--accent-600));color:white;border-color:transparent;box-shadow:0 10px 30px rgba(6,182,160,0.12)}
+    .small{font-size:13px;color:#64748b}
+
+    /* prompt output */
+    .prompt-box{background:#061225;color:#9ee9cf;padding:12px;border-radius:10px;font-family: "Vazirmatn", ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;font-size:13px;white-space:pre-wrap}
+
+    /* floating nav */
+    .nav {
+      display:flex;
+      gap:10px;
+      padding:12px;
+      border-top:1px solid rgba(11,17,32,0.04);
+      background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    }
+    .btn {
+      flex:1;
+      padding:12px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      border:0;
+    }
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(6,182,160,0.12)}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-600));color:white;box-shadow:0 12px 30px rgba(6,182,160,0.12)}
+
+    /* small helpers */
+    .muted{color:#6b7280;font-size:13px}
+    .center{text-align:center}
+
+    /* accessible focus */
+    .option:focus,.btn:focus,.input-field:focus{outline:3px solid rgba(6,182,160,0.12);outline-offset:2px}
+
+    /* responsive */
+    @media (min-width:520px){
+      body{padding:30px}
+      .app{transform:scale(1);max-width:520px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-labelledby="appTitle">
+    <!-- Header -->
+    <div class="app-header">
+      <div class="logo" aria-hidden="true">⚡</div>
+      <div>
+        <div id="appTitle" class="text-lg font-bold">الان چیکار کنم؟</div>
+        <div class="small">۴ مرحله — برنامهٔ فوری و قابل اجرا</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="app-body" id="appBody">
+      <!-- Progress -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="small">مرحله <span id="stepNum">1</span> از 4</div>
+          <div class="small muted" id="liveHint">شروع کن — حتی ۱ دقیقه کافی است</div>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar" class="progress-bar" style="width:25%"></div>
+        </div>
+      </div>
+
+      <!-- Step content (Wizard panels) -->
+      <div id="wizard" class="space-y-4">
+        <!-- Warm Start: brief motivation + micro-pledge -->
+        <section class="step-card" data-step="0" aria-hidden="false">
+          <div class="center mb-2">
+            <div class="text-xl font-semibold">شروع آسان، بدون فشار</div>
+            <div class="muted mt-1">این برنامه برای کسی است که می‌خواهد از صفر شروع کند. فقط ۱ اقدام کوچک انجام بده.</div>
+          </div>
+
+          <div class="mt-3">
+            <div class="small mb-1">آیا آماده‌ای برای یک شروع خیلی کوچک؟</div>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="pledgeYes" class="btn primary" aria-pressed="false">آره، آماده‌ام</button>
+              <button id="pledgeNo" class="btn ghost" aria-pressed="false">فعلاً نه</button>
+            </div>
+          </div>
+
+          <div class="mt-4 small muted">پیشنهاد: اگر الان «نه» زدی، فقط یک بار امتحان کن: ۲ دقیقه — هیچ چیز از دست نمی‌دهی.</div>
+        </section>
+
+        <!-- Step 1: Task (very small, behavior-based) -->
+        <section class="step-card hidden" data-step="1" aria-hidden="true">
+          <div class="center mb-2">
+            <div class="text-lg font-semibold">۱ — کار خیلی کوچک انتخاب کن</div>
+            <div class="muted mt-1">یک کار که مطمئنی می‌توانی همین الآن شروع کنی.</div>
+          </div>
+
+          <div class="mt-3">
+            <label class="small mb-1 block">توضیح کوتاه کار (مثلاً: ۱۰ دقیقه خواندن یک پاراگراف)</label>
+            <input id="taskInput" class="input-field" placeholder="مثلاً: ۱۰ دقیقه مطالعه یک پاراگراف..." aria-label="توضیح کار" />
+            <div class="mt-3 small mb-1">قالب‌های پیشنهادی</div>
+            <div class="grid grid-cols-3 gap-2 mt-1">
+              <div tabindex="0" role="button" class="option center" data-val="۱۰ دقیقه مطالعه">📘<div class="small muted">مطالعه ۱۰ دقیقه</div></div>
+              <div tabindex="0" role="button" class="option center" data-val="۱۵ دقیقه تمرین">🏋️‍♂️<div class="small muted">۱۵ دقیقه تمرین</div></div>
+              <div tabindex="0" role="button" class="option center" data-val="۲۰ دقیقه کدنویسی">💻<div class="small muted">۲۰ دقیقه کد</div></div>
+            </div>
+
+            <div class="mt-3 small muted">نکته: کار را تا حد ممکن کوچک کن — شروع مهم‌تر از کامل انجام دادن است.</div>
+          </div>
+        </section>
+
+        <!-- Step 2: Energy & Mood -->
+        <section class="step-card hidden" data-step="2" aria-hidden="true">
+          <div class="center mb-2">
+            <div class="text-lg font-semibold">۲ — انرژی و حالِ فعلی</div>
+            <div class="muted mt-1">این کمک می‌کند برنامه متناسب با وضعیت واقعی‌ات ساخته شود.</div>
+          </div>
+
+          <div class="mt-3">
+            <label class="small mb-1 block">انرژیِ الان</label>
+            <input id="energyRange" type="range" min="1" max="10" value="5" class="w-full" aria-label="انرژی"/>
+            <div class="flex items-center justify-between mt-1">
+              <div class="small muted">کم</div>
+              <div id="energyVal" class="font-bold">۵</div>
+              <div class="small muted">زیاد</div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="small mb-1 block">حالت روحی الان</label>
+            <div class="grid grid-cols-4 gap-2">
+              <div tabindex="0" role="button" class="option center" data-mood="عالی">😊<div class="small muted">عالی</div></div>
+              <div tabindex="0" role="button" class="option center" data-mood="معمولی">😐<div class="small muted">معمولی</div></div>
+              <div tabindex="0" role="button" class="option center selected" data-mood="خسته">😔<div class="small muted">خسته</div></div>
+              <div tabindex="0" role="button" class="option center" data-mood="استرسی">😰<div class="small muted">استرس</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 3: Time + Barrier -->
+        <section class="step-card hidden" data-step="3" aria-hidden="true">
+          <div class="center mb-2">
+            <div class="text-lg font-semibold">۳ — چقدر وقت داری و چه چیزی مزاحم است؟</div>
+            <div class="muted mt-1">برنامه را بر اساس وقت و موانع طراحی می‌کنیم.</div>
+          </div>
+
+          <div class="mt-3">
+            <label class="small mb-1 block">مدت در دسترس</label>
+            <div class="grid grid-cols-3 gap-2">
+              <div tabindex="0" role="button" class="option center" data-time="۱۵-۳۰">⚡<div class="small muted">۱۵–۳۰</div></div>
+              <div tabindex="0" role="button" class="option center selected" data-time="۶۰">🕐<div class="small muted">۱ ساعت</div></div>
+              <div tabindex="0" role="button" class="option center" data-time="۱۲۰+">📅<div class="small muted">۲+ ساعت</div></div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="small mb-1 block">چه چیزی ممکن است حواست را پرت کند؟</label>
+            <div class="grid grid-cols-2 gap-2">
+              <div tabindex="0" role="button" class="option center selected" data-barrier="گوشی">📱<div class="small muted">گوشی</div></div>
+              <div tabindex="0" role="button" class="option center" data-barrier="خستگی">😴<div class="small muted">خستگی</div></div>
+              <div tabindex="0" role="button" class="option center" data-barrier="سر و صدا">🔊<div class="small muted">سر و صدا</div></div>
+              <div tabindex="0" role="button" class="option center" data-barrier="بی‌حوصلگی">😑<div class="small muted">بی‌حوصلگی</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 4: Review & Generate -->
+        <section class="step-card hidden" data-step="4" aria-hidden="true">
+          <div class="center mb-2">
+            <div class="text-lg font-semibold">۴ — بررسی و ساخت برنامه</div>
+            <div class="muted mt-1">خروجیِ واضح، دقیق و قابل اجرا بر اساس وضعیتت ساخته می‌شود.</div>
+          </div>
+
+          <div class="mt-3">
+            <div class="small mb-1">خلاصهٔ وضعیت</div>
+            <div id="summaryBox" class="p-3 rounded-lg bg-gray-50 small muted"></div>
+          </div>
+
+          <div class="mt-3">
+            <div class="small mb-1">پیشنهاد من (قابل اجرا، قدم‌به‌قدم)</div>
+            <div id="promptArea" class="prompt-box mt-2">برای ساخت برنامه روی «بساز» بزن.</div>
+          </div>
+
+          <div class="mt-3 small muted">نکته: خروجی در قالب توصیه‌ها و If-Then آماده می‌شود تا در مواجهه با مانع دقیقاً بدانی چیکار کنی.</div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav">
+      <button id="backBtn" class="btn ghost" aria-label="قبلی">← قبلی</button>
+      <button id="nextBtn" class="btn primary" aria-label="بعدی">بعدی →</button>
+    </div>
+
+    <!-- Save indicator (floating) -->
+    <div id="saveToast" class="fixed bottom-6 left-6 bg-black text-white px-3 py-2 rounded-full text-xs hidden">ذخیره شد</div>
+  </div>
+
+  <script>
+  (function(){
+    // ---------- Helpers ----------
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+    const STORAGE = 'behavioral_mobile_v1';
+
+    function toPersian(num){
+      const map = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+      return String(num).replace(/\d/g, d => map[d]);
+    }
+
+    // ---------- State ----------
+    const state = {
+      step: 0, // warm-start is 0, then 1..4
+      total: 4,
+      data: {
+        pledged: false,
+        task: '',
+        energy: 5,
+        mood: 'خسته',
+        time: '۶۰',
+        barrier: 'گوشی',
+        createdAt: new Date().toISOString()
+      },
+      autosaveTimer: null
+    };
+
+    // ---------- Elements ----------
+    const appBody = $('#appBody');
+    const stepNumEl = $('#stepNum');
+    const progressBar = $('#progressBar');
+    const wizardPanels = $$('[data-step]');
+    const backBtn = $('#backBtn');
+    const nextBtn = $('#nextBtn');
+    const saveToast = $('#saveToast');
+
+    // Warm
+    const pledgeYes = $('#pledgeYes');
+    const pledgeNo = $('#pledgeNo');
+
+    // Step1
+    const taskInput = $('#taskInput');
+    const taskOptions = $$('.step-card[data-step="1"] .option');
+
+    // Step2
+    const energyRange = $('#energyRange');
+    const energyVal = $('#energyVal');
+    const moodButtons = $$('.step-card[data-step="2"] .option');
+
+    // Step3
+    const timeButtons = $$('.step-card[data-step="3"] .option[data-time]');
+    const barrierButtons = $$('.step-card[data-step="3"] .option[data-barrier]');
+
+    // Step4
+    const summaryBox = $('#summaryBox');
+    const promptArea = $('#promptArea');
+
+    // ---------- Load / Save ----------
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          Object.assign(state.data, parsed);
+          console.log('state loaded', state.data);
+        }
+      }catch(e){}
+    }
+
+    function save(){
+      try{
+        localStorage.setItem(STORAGE, JSON.stringify(state.data));
+        flashSave();
+      }catch(e){}
+    }
+
+    function scheduleSave(){
+      if(state.autosaveTimer) clearTimeout(state.autosaveTimer);
+      state.autosaveTimer = setTimeout(save, 700);
+    }
+
+    function flashSave(){
+      saveToast.classList.remove('hidden');
+      saveToast.style.opacity = '1';
+      setTimeout(()=>{ saveToast.style.opacity = '0'; saveToast.classList.add('hidden'); }, 1100);
+    }
+
+    // ---------- UI helpers ----------
+    function showStep(n){
+      state.step = n;
+      // hide all panels
+      wizardPanels.forEach(p => p.classList.add('hidden'));
+      // show warm (0) or step n
+      const panel = document.querySelector('.step-card[data-step="'+n+'"]');
+      if(panel) panel.classList.remove('hidden');
+      // update progress
+      const pct = ((n+1) / (state.total + 1)) * 100; // warm included for smoother feeling
+      progressBar.style.width = pct + '%';
+      stepNumEl.textContent = toPersian(Math.max(1, n));
+      // nav labels
+      backBtn.disabled = (n === 0);
+      backBtn.classList.toggle('opacity-50', n === 0);
+      if(n < state.total) {
+        nextBtn.textContent = 'بعدی →';
+      } else {
+        nextBtn.textContent = 'بساز';
+      }
+      // refresh live summary
+      renderLiveSummary();
+    }
+
+    function renderLiveSummary(){
+      // create small summary for step 4
+      const d = state.data;
+      const t = d.task || '—';
+      const s = `کار: ${t} · انرژی: ${toPersian(d.energy)}/۱۰ · حالت: ${d.mood} · وقت: ${d.time} · مانع: ${d.barrier}`;
+      summaryBox.textContent = s;
+    }
+
+    // ---------- Interaction bindings ----------
+    // Warm start
+    pledgeYes.addEventListener('click', ()=> {
+      state.data.pledged = true;
+      scheduleSave();
+      showStep(1);
+    });
+    pledgeNo.addEventListener('click', ()=> {
+      // gentle nudge: still allow proceed but mark as not pledged
+      state.data.pledged = false;
+      scheduleSave();
+      showStep(1);
+    });
+
+    // Step1: task input & options
+    taskInput.value = state.data.task || '';
+    taskInput.addEventListener('input', e => {
+      state.data.task = e.target.value.trim();
+      scheduleSave();
+      renderLiveSummary();
+    });
+    taskOptions.forEach(opt => {
+      opt.addEventListener('click', ()=> {
+        taskOptions.forEach(x=>x.classList.remove('selected'));
+        opt.classList.add('selected');
+        const v = opt.dataset.val;
+        state.data.task = v;
+        taskInput.value = v;
+        scheduleSave();
+        renderLiveSummary();
+      });
+      opt.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key === ' ') opt.click(); });
+    });
+
+    // Step2: energy + mood
+    energyRange.value = state.data.energy;
+    energyVal.textContent = toPersian(state.data.energy);
+    energyRange.addEventListener('input', (e)=>{
+      const v = Number(e.target.value);
+      state.data.energy = clamp(v,1,10);
+      energyVal.textContent = toPersian(state.data.energy);
+      scheduleSave();
+      renderLiveSummary();
+    });
+
+    moodButtons.forEach(m => {
+      if(m.dataset.mood === state.data.mood) m.classList.add('selected');
+      m.addEventListener('click', ()=> {
+        moodButtons.forEach(x=>x.classList.remove('selected'));
+        m.classList.add('selected');
+        state.data.mood = m.dataset.mood;
+        scheduleSave();
+        renderLiveSummary();
+      });
+    });
+
+    // Step3: time & barrier
+    timeButtons.forEach(tbtn => {
+      if(tbtn.dataset.time === state.data.time) tbtn.classList.add('selected');
+      tbtn.addEventListener('click', ()=> {
+        timeButtons.forEach(x=>x.classList.remove('selected'));
+        tbtn.classList.add('selected');
+        state.data.time = tbtn.dataset.time;
+        scheduleSave();
+        renderLiveSummary();
+      });
+    });
+
+    barrierButtons.forEach(bbtn => {
+      if(bbtn.dataset.barrier === state.data.barrier) bbtn.classList.add('selected');
+      bbtn.addEventListener('click', ()=> {
+        barrierButtons.forEach(x=>x.classList.remove('selected'));
+        bbtn.classList.add('selected');
+        state.data.barrier = bbtn.dataset.barrier;
+        scheduleSave();
+        renderLiveSummary();
+      });
+    });
+
+    // Nav
+    backBtn.addEventListener('click', ()=>{
+      const next = Math.max(0, state.step - 1);
+      showStep(next);
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    nextBtn.addEventListener('click', ()=>{
+      if(state.step < state.total){
+        // move next
+        const next = Math.min(state.total, state.step + 1);
+        showStep(next);
+        window.scrollTo({top:0,behavior:'smooth'});
+      } else {
+        // generate final plan
+        generatePlan();
+      }
+    });
+
+    // keyboard: Enter to go next when input focused
+    taskInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') nextBtn.click(); });
+
+    // ---------- Behavioral logic: generate plan ----------
+    // Helper: mood hint
+    function moodAdvice(m){
+      const map = {
+        'عالی':'سطح انرژی بالا — می‌توان کار چالشی پیشنهاد داد.',
+        'معمولی':'انرژی متوسط — بهترین زمان کارهای هدفمند است.',
+        'خسته':'انرژی پایین — کارها کوتاه و رفتاری باشند.',
+        'استرسی':'پیشنهاد: 1-2 دقیقه تمرین آرام‌سازی قبل از شروع.'
+      };
+      return map[m] || '';
+    }
+
+    function planGenerator(data){
+      // Returns object: {immediate, steps[], ifthen, emergency}
+      const task = data.task || (['یکم درس بخونم','کارم رو انجاام بدم','ورزش کنم'])[Math.floor(Math.random()*3)];
+      const energy = Number(data.energy);
+      const t = data.time;
+      // decide time bucket
+      let bucket = 'hour';
+      if(String(t).includes('۱۵') || String(t).includes('15')) bucket = 'short';
+      if(String(t).includes('۲') || String(t).includes('+')) bucket = 'long';
+
+      // Base strategies using BJ Fogg (Motivation x Ability x Prompt)
+      // We produce immediate tiny prompt + plan steps
+      if(energy <= 3){
+        if(bucket === 'short'){
+          return {
+            immediate: `همین الان: 1 دقیقه تنفس → 10 دقیقه کار بسیار ساده روی «${task}»`,
+            steps: [`10 دقیقه کار ادامه‌دار با تایمر`],
+            ifthen: data.barrier === 'گوشی' ? 'If-Then: گوشی را در اتاق دیگر بگذار.' : 'If-Then: اگر خسته شدی، 5 دقیقه استراحت کن.',
+            emergency: 'نسخه اضطراری: 5 دقیقه کار با هدف بسیار کوچک'
+          };
+        }
+        if(bucket === 'hour'){
+          return {
+            immediate: `همین الان: 1 دقیقه آماده‌سازی → 20 دقیقه کار ساده روی «${task}»`,
+            steps: [`20 دقیقه کار با تایمر 20/5`],
+            ifthen: data.barrier === 'گوشی' ? 'If-Then: زمان گوشی را محدود کن.' : 'If-Then: اگر حواست پرت شد، 2 دقیقه برگرد.',
+            emergency: 'نسخه اضطراری: 10 دقیقه با هدف کوچک'
+          };
+        }
+        return {
+          immediate: `شروع: 1 دقیقه تنظیم محیط → 30 دقیقه کار بخش‌بندی شده روی «${task}»`,
+          steps: [`30 دقیقه به 2 بخش 15/5 تقسیم کن`],
+          ifthen: 'If-Then: اگر متوقف شدی، 5 دقیقه پیاده‌روی کوتاه انجام بده.',
+          emergency: 'نسخه اضطراری: 15 دقیقه با هدف حداقلی'
+        };
+      }
+
+      if(energy <= 6){
+        if(bucket === 'short'){
+          return {
+            immediate: `همین الان: 30 ثانیه هدف‌گذاری → 15 دقیقه کار متمرکز روی «${task}»`,
+            steps: [`15 دقیقه کار + 5 دقیقه مرور`],
+            ifthen: data.barrier === 'گوشی' ? 'If-Then: اعلان‌ها را خاموش کن.' : 'If-Then: هدفون بزن.',
+            emergency: 'نسخه اضطراری: 10 دقیقه کار پیوسته'
+          };
+        }
+        if(bucket === 'hour'){
+          return {
+            immediate: `همین الان: 1 دقیقه تعیین هدف → 45 دقیقه کار متمرکز`,
+            steps: [`45 دقیقه کار + 10 دقیقه مرور`],
+            ifthen: 'If-Then: اگر مزاحم شدی، 2 دقیقه تنفس کن سپس ادامه بده.',
+            emergency: 'نسخه اضطراری: 20 دقیقه با تمرکز'
+          };
+        }
+        return {
+          immediate: `شروع: 2 دقیقه برنامه‌ریزی بخش‌ها → 90 دقیقه کار ساختاری`,
+          steps: [`90 دقیقه تقسیم به 3 بخش 30 دقیقه‌ای`],
+          ifthen: 'If-Then: اگر تمرکز رفت، 5 دقیقه استراحت کن.',
+          emergency: 'نسخه اضطراری: 30 دقیقه با هدف مشخص'
+        };
+      }
+
+      // high energy
+      if(bucket === 'short'){
+        return {
+          immediate: `همین الان: 30 ثانیه آماده‌سازی → 20 دقیقه کار پُرانرژی روی «${task}»`,
+          steps: [`20 دقیقه با هدف مشخص`],
+          ifthen: 'If-Then: گوشی را خاموش کن.',
+          emergency: 'نسخه اضطراری: 20 دقیقه کار متمرکز'
+        };
+      }
+      if(bucket === 'hour'){
+        return {
+          immediate: `همین الان: 1 دقیقه هدف‌گذاری → 90 دقیقه کار عمیق (50/10/30)`,
+          steps: [`60 دقیقه کار + 10 دقیقه استراحت + 20 دقیقه مرور`],
+          ifthen: 'If-Then: اگر مزاحم شدی، از محیط فاصله بگیر.',
+          emergency: 'نسخه اضطراری: 40 دقیقه با تمرکز'
+        };
+      }
+      return {
+        immediate: `شروع: 1 دقیقه طرح‌ریزی → 2+ ساعت بلوک عمیق برای «${task}»`,
+        steps: [`2 ساعت تقسیم به 2 جلسه 50 دقیقه‌ای`],
+        ifthen: 'If-Then: در صورت وقفه طولانی، 10 دقیقه قدم بزن و ادامه بده.',
+        emergency: 'نسخه اضطراری: 60 دقیقه با هدف مشخص'
+      };
+    }
+
+    function buildPromptText(stateData){
+      const plan = planGenerator(stateData);
+      const d = stateData;
+      const lines = [];
+      lines.push(`# ⚡ برنامهٔ فوری برای شروع`);
+      lines.push(`- کار: ${d.task || 'یک کار کوچک'}`);
+      lines.push(`- انرژی: ${d.energy}/10 — ${moodAdvice(d.mood)}`);
+      lines.push(`- زمان موجود: ${d.time}`);
+      lines.push(`- مانع: ${d.barrier}`);
+      lines.push('');
+      lines.push(`## شروع فوری:`);
+      lines.push(plan.immediate);
+      lines.push('');
+      lines.push(`## برنامهٔ مرحله‌ای:`);
+      plan.steps.forEach((s,i)=> lines.push((i+1)+'. '+s));
+      lines.push('');
+      lines.push(`## If-Then:`);
+      lines.push(plan.ifthen);
+      lines.push('');
+      lines.push(`## نسخهٔ اضطراری:`);
+      lines.push(plan.emergency);
+      lines.push('');
+      lines.push(`(خروجی را کوتاه، فهرست‌شده و قابل اجرا بده — هر قدم زیر 15 دقیقه باشد.)`);
+      return lines.join('\\n');
+    }
+
+    function generatePlan(){
+      // ensure latest UI data
+      state.data.task = taskInput.value.trim() || state.data.task;
+      // render prompt
+      const prompt = buildPromptText(state.data);
+      promptArea.textContent = prompt;
+      // show step 4 panel if not shown
+      showStep(4);
+      save();
+    }
+
+    // ---------- Init ----------
+    function init(){
+      load();
+      // apply state to UI
+      taskInput.value = state.data.task || '';
+      energyRange.value = state.data.energy || 5;
+      energyVal.textContent = toPersian(state.data.energy || 5);
+      // mark selected options based on loaded data
+      // step1 options
+      $$('.step-card[data-step="1"] .option').forEach(o=>{
+        if(o.dataset.val === state.data.task) o.classList.add('selected');
+      });
+      // mood
+      moodButtons.forEach(m => { if(m.dataset.mood === state.data.mood) m.classList.add('selected'); });
+      // time
+      timeButtons.forEach(t => { if(t.dataset.time === state.data.time) t.classList.add('selected'); });
+      // barrier
+      barrierButtons.forEach(b => { if(b.dataset.barrier === state.data.barrier) b.classList.add('selected'); });
+
+      // initial view (warm)
+      showStep(0);
+    }
+
+    init();
+
+    // expose generatePlan for debugging
+    window._generatePlan = generatePlan;
+
+  })();
+  </script>
+</body>
+</html>
