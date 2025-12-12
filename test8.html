@@ -1,0 +1,2996 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="برنامه‌ریزی روزانه با فرمول To-Do List">
+  <meta name="theme-color" content="#10B981">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoi2YHYsdmF2YjZhCBUby1EbyIsInNob3J0X25hbWUiOiJUb0RvIiwic3RhcnRfdXJsIjoiLiIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNGOEZBRkMiLCJ0aGVtZV9jb2xvciI6IiMxMEI5ODEifQ==">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+  <title>فرمول To-Do</title>
+  <style>
+    :root {
+      --primary: #10B981;
+      --primary-light: #D1FAE5;
+      --primary-dark: #059669;
+      --secondary: #6366F1;
+      --secondary-light: #E0E7FF;
+      --warning: #F59E0B;
+      --warning-light: #FEF3C7;
+      --danger: #EF4444;
+      --danger-light: #FEE2E2;
+      --orange: #F97316;
+      --orange-light: #FFEDD5;
+      --bg: #F8FAFC;
+      --bg2: #FFFFFF;
+      --bg3: #F1F5F9;
+      --text: #1E293B;
+      --text2: #64748B;
+      --text3: #94A3B8;
+      --border: #E2E8F0;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    
+    [data-theme="dark"] {
+      --bg: #0F172A;
+      --bg2: #1E293B;
+      --bg3: #334155;
+      --text: #F1F5F9;
+      --text2: #94A3B8;
+      --text3: #64748B;
+      --border: #334155;
+      --primary-light: #064E3B;
+      --secondary-light: #312E81;
+      --warning-light: #78350F;
+      --danger-light: #7F1D1D;
+      --orange-light: #7C2D12;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+    
+    body {
+      font-family: 'Vazirmatn', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .app {
+      height: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 10px 14px;
+      padding-top: calc(10px + var(--safe-top));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    
+    .header-title { font-size: 1rem; font-weight: 700; }
+    .header-btns { display: flex; gap: 6px; }
+    
+    .header-btn {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Main */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      padding-bottom: calc(75px + var(--safe-bottom));
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Page Center & Layout System */
+    .main {
+      display: flex;
+      flex-direction: column;
+      /* Ensure main takes full height to allow vertical centering */
+      flex: 1;
+      position: relative;
+    }
+
+    .page { 
+      display: none; 
+      width: 100%;
+      /* Default to full height flex column */
+      min-height: 100%;
+      flex-direction: column;
+      /* By default, center content vertically if short */
+      justify-content: center; 
+      padding-bottom: 80px; /* Space for nav */
+    }
+    
+    .page.active { 
+      display: flex; 
+      animation: fadeIn 0.3s ease; 
+    }
+
+    /* For pages that MUST start at top (like long lists), add .page-top class */
+    .page.page-top {
+      justify-content: flex-start;
+    }
+    
+    /* Wrapper to ensure content doesn't stretch weirdly */
+    .page > * {
+      width: 100%;
+    }
+
+    /* Page Center (Explicit) */
+    .page-center {
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .page-content { width: 100%; max-width: 450px; margin: 0 auto; }
+    
+    /* Cards */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .card-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    
+    .card-icon.green { background: var(--primary-light); }
+    .card-icon.blue { background: var(--secondary-light); }
+    .card-icon.yellow { background: var(--warning-light); }
+    .card-icon.red { background: var(--danger-light); }
+    .card-icon.orange { background: var(--orange-light); }
+    .card-icon.gray { background: var(--bg3); }
+    
+    .card-title { font-size: 0.95rem; font-weight: 700; }
+    .card-subtitle { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
+    
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 20px; /* Taller buttons */
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+      transition: transform 0.1s, box-shadow 0.2s;
+      min-height: 52px; /* Touch target standard */
+    }
+    
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: var(--secondary); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-light { background: var(--primary-light); color: var(--primary-dark); }
+    .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+    .btn-sm { padding: 8px 12px; font-size: 0.8rem; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    
+    /* Inputs & Touch Targets */
+    .input, .textarea, .select {
+      width: 100%;
+      padding: 14px 16px; /* Larger touch area */
+      border: 2px solid var(--border);
+      border-radius: 14px; /* Softer corners */
+      font-size: 0.95rem; /* Readable text */
+      font-family: inherit;
+      background: var(--bg2);
+      color: var(--text);
+      transition: all 0.2s;
+      margin-bottom: 4px;
+    }
+    
+    .input:focus, .textarea:focus, .select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-light);
+    }
+    
+    label { margin-top: 8px; }
+
+    /* Fix touch targets for mobile */
+    button, .btn, .nav-item, .list-tab, .chip, input, select, textarea {
+      touch-action: manipulation;
+    }
+    
+    .textarea { resize: vertical; min-height: 80px; }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; }
+    .form-hint { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
+    
+    /* Chips */
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    
+    .chip {
+      padding: 8px 14px;
+      background: var(--bg3);
+      border: 2px solid transparent;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    
+    .chip.selected { background: var(--primary); color: white; }
+    
+    /* Priority chips */
+    .priority-chips { display: flex; gap: 6px; }
+    .priority-chip {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      transition: all 0.2s;
+    }
+    .priority-chip.low { border-color: var(--primary); color: var(--primary); }
+    .priority-chip.medium { border-color: var(--warning); color: var(--warning); }
+    .priority-chip.high { border-color: var(--danger); color: var(--danger); }
+    .priority-chip.selected.low { background: var(--primary-light); }
+    .priority-chip.selected.medium { background: var(--warning-light); }
+    .priority-chip.selected.high { background: var(--danger-light); }
+    
+    /* Tags */
+    .tag {
+      display: inline-flex;
+      padding: 3px 8px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    
+    .tag.yellow { background: var(--warning-light); color: #92400E; }
+    .tag.red { background: var(--danger-light); color: #991B1B; }
+    .tag.blue { background: var(--secondary-light); color: #4338CA; }
+    .tag.orange { background: var(--orange-light); color: #9A3412; }
+    
+    [data-theme="dark"] .tag { color: var(--primary); }
+    [data-theme="dark"] .tag.yellow { color: var(--warning); }
+    [data-theme="dark"] .tag.red { color: var(--danger); }
+    [data-theme="dark"] .tag.blue { color: var(--secondary); }
+    [data-theme="dark"] .tag.orange { color: var(--orange); }
+    
+    /* Progress */
+    .progress { height: 8px; background: var(--bg3); border-radius: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 8px; transition: width 0.4s; }
+    
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+    
+    .stat {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 10px 6px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    
+    .stat-num { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+    .stat-label { font-size: 0.65rem; color: var(--text2); margin-top: 2px; }
+    
+    /* Task */
+    .task {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      background: var(--bg3);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border-right: 4px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .task:hover { background: var(--border); }
+    .task.importance-high { border-color: var(--danger); }
+    .task.importance-medium { border-color: var(--warning); }
+    .task.importance-low { border-color: var(--primary); }
+    .task.done { opacity: 0.5; }
+    .task.done .task-title { text-decoration: line-through; }
+    .task.blocked { background: var(--orange-light); }
+    
+    .task-check {
+      width: 24px; height: 24px;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: transparent;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    
+    .task-check.checked { background: var(--primary); border-color: var(--primary); color: white; }
+    .task-content { flex: 1; min-width: 0; }
+    .task-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 4px; }
+    .task-meta { display: flex; flex-wrap: wrap; gap: 4px; }
+    .task-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    
+    .task-btn {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: var(--bg2);
+      color: var(--text2);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    
+    /* List tabs (Segmented Control) */
+    .list-tabs { 
+      display: flex; 
+      width: 100%;
+      background: var(--bg3);
+      padding: 4px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    .list-tab {
+      flex: 1; /* Make tabs fill the width equally */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text2);
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .list-tab.active { 
+      background: var(--bg2); 
+      color: var(--primary); 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .list-tab .badge {
+      background: var(--bg3);
+      color: var(--text2);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      margin-inline-start: 6px;
+    }
+
+    .list-tab.active .badge {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+    
+    /* Capacity */
+    .capacity {
+      background: var(--bg3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    
+    .capacity-header { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 6px; }
+    .capacity-value { font-weight: 700; }
+    .capacity-value.warning { color: var(--warning); }
+    .capacity-value.danger { color: var(--danger); }
+    
+    /* Modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .modal.show { opacity: 1; visibility: visible; }
+    
+    .modal-box {
+      background: var(--bg2);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 16px;
+      transform: translateY(100%);
+      transition: transform 0.3s;
+    }
+    
+    .modal.show .modal-box { transform: translateY(0); }
+    
+    .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 12px; }
+    .modal-title { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 16px; }
+    
+    /* Nav - Professional */
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr auto 1fr 1fr;
+      align-items: end;
+      padding: 0 10px;
+      padding-bottom: calc(8px + var(--safe-bottom));
+      height: calc(65px + var(--safe-bottom));
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+      z-index: 100;
+    }
+
+    [data-theme="dark"] .nav {
+      background: rgba(30, 41, 59, 0.95);
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--text3);
+      transition: all 0.2s;
+      height: 100%;
+    }
+    
+    .nav-item.active { color: var(--primary); }
+    .nav-item.active .nav-icon { transform: translateY(-2px); }
+    
+    .nav-icon { font-size: 1.4rem; margin-bottom: 3px; transition: transform 0.2s; }
+    .nav-label { font-size: 0.65rem; font-weight: 600; }
+
+    /* Floating Action Button (FAB) */
+    .nav-fab-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      height: 100%;
+      pointer-events: none; /* Let clicks pass to button */
+    }
+
+    .nav-fab {
+      pointer-events: auto;
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      border: 4px solid var(--bg);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      transform: translateY(-25px);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-fab:active { transform: translateY(-22px) scale(0.95); }
+    
+    [data-theme="dark"] .nav-fab { border-color: var(--bg); }
+    
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--bg);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 9999;
+      box-shadow: var(--shadow-lg);
+    }
+    
+    /* Accordion */
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    
+    .accordion-header {
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .accordion-icon { font-size: 0.75rem; transition: transform 0.2s; }
+    .accordion.open .accordion-icon { transform: rotate(180deg); }
+    .accordion-body { padding: 0 14px 14px; display: none; font-size: 0.85rem; line-height: 1.7; color: var(--text2); }
+    .accordion.open .accordion-body { display: block; }
+    
+    /* Welcome banner */
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    .welcome-banner h2 { font-size: 1rem; font-weight: 700; margin-bottom: 2px; }
+    .welcome-banner p { font-size: 0.8rem; opacity: 0.9; }
+    
+    /* Review card */
+    .review-card {
+      background: var(--secondary-light);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    
+    .review-card h4 { font-size: 0.85rem; margin-bottom: 6px; color: var(--secondary); }
+    .review-card p { font-size: 0.8rem; color: var(--text2); }
+    
+    /* Dots */
+    .dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); }
+    .dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
+    .dot.done { background: var(--primary); opacity: 0.4; }
+    
+    /* Empty */
+    .empty { text-align: center; padding: 24px 16px; color: var(--text3); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 8px; opacity: 0.5; }
+    .empty-text { font-size: 0.9rem; }
+    
+    /* Tiny task */
+    .tiny-task {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--bg3);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    
+    .tiny-task-text { flex: 1; font-size: 0.85rem; }
+    
+    /* Prompt box */
+    .prompt-box {
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      max-height: 250px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      direction: ltr;
+      text-align: left;
+    }
+    
+    /* Utils */
+    .hidden { display: none !important; }
+    .mb-2 { margin-bottom: 8px; }
+    .mb-3 { margin-bottom: 12px; }
+    .mt-2 { margin-top: 8px; }
+    .mt-3 { margin-top: 12px; }
+    .text-center { text-align: center; }
+    .text-muted { color: var(--text2); }
+    .text-sm { font-size: 0.8rem; }
+    .flex { display: flex; }
+    .flex-1 { flex: 1; }
+    .gap-2 { gap: 8px; }
+    .items-center { align-items: center; }
+    
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header hidden" id="header">
+      <h1 class="header-title">✅ فرمول To-Do</h1>
+      <div class="header-btns">
+        <button class="header-btn" onclick="goToPage('brain')" title="تخلیه ذهن">🧠</button>
+        <button class="header-btn" onclick="goToPage('ai')" title="تحلیل AI">🤖</button>
+        <button class="header-btn" onclick="goToPage('settings')" title="تنظیمات">⚙️</button>
+      </div>
+    </header>
+    
+    <main class="main" id="main">
+      
+      <!-- Modals -->
+      <div class="modal" id="backupModal">
+        <div class="modal-box">
+          <div class="modal-handle"></div>
+          <h2 class="modal-title">💾 پشتیبان‌گیری</h2>
+          <p class="text-center text-muted mb-3">فایل در پوشه Downloads ذخیره می‌شود</p>
+          <button onclick="downloadBackup()" class="btn btn-primary mb-2">📥 دانلود فایل بکاپ</button>
+          <button onclick="copyBackup()" class="btn btn-warning mb-2">📋 کپی متن بکاپ</button>
+          <label class="btn btn-light mb-2" style="cursor:pointer">
+            📤 بازیابی از فایل
+            <input type="file" accept=".json,.txt" style="display:none" onchange="handleImport(this)">
+          </label>
+          <button onclick="hideBackupModal()" class="btn btn-outline">بستن</button>
+        </div>
+      </div>
+      
+      <!-- Task Modal -->
+      <div class="modal" id="taskModal">
+        <div class="modal-box">
+          <div class="modal-handle"></div>
+          <h2 class="modal-title" id="taskModalTitle">➕ افزودن کار جدید</h2>
+          <input type="hidden" id="editTaskId">
+          
+          <div class="form-group">
+            <label class="form-label">عنوان کار (با فعل شروع شود)</label>
+            <input type="text" id="taskTitle" class="input" placeholder="مثال: تماس بگیرم با...">
+            <p class="form-hint">💡 با فعل شروع کن: بنویس، تماس بگیر، مرور کن...</p>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">نتیجه مطلوب (چرا این کار مهم است؟)</label>
+            <input type="text" id="taskOutcome" class="input" placeholder="تا پروژه جلو برود">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">یادداشت و جزئیات</label>
+            <textarea id="taskNotes" class="textarea" rows="2" placeholder="هر توضیح اضافه‌ای..."></textarea>
+          </div>
+          
+          <div class="btn-row mb-3">
+            <div class="form-group" style="margin:0">
+              <label class="form-label">زمان (دقیقه)</label>
+              <input type="number" id="taskTime" class="input" value="30" min="5">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="form-label">ددلاین</label>
+              <input type="date" id="taskDeadline" class="input">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">اهمیت</label>
+            <div class="priority-chips" id="importanceChips">
+              <div class="priority-chip low" data-v="low" onclick="selectImportance('low')">🟢 کم</div>
+              <div class="priority-chip medium selected" data-v="medium" onclick="selectImportance('medium')">🟡 متوسط</div>
+              <div class="priority-chip high" data-v="high" onclick="selectImportance('high')">🔴 زیاد</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">فوریت</label>
+            <div class="priority-chips" id="urgencyChips">
+              <div class="priority-chip low" data-v="low" onclick="selectUrgency('low')">🐢 آرام</div>
+              <div class="priority-chip medium selected" data-v="medium" onclick="selectUrgency('medium')">🚶 عادی</div>
+              <div class="priority-chip high" data-v="high" onclick="selectUrgency('high')">🏃 فوری</div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">نقش مرتبط</label>
+            <select id="taskRole" class="select"></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">مرتبط با پروژه (اختیاری)</label>
+            <select id="taskProject" class="select">
+              <option value="">-- بدون پروژه --</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">نیاز به پیگیری از دیگران؟</label>
+            <div class="flex gap-2 items-center">
+              <input type="checkbox" id="taskBlocked" style="width:20px;height:20px">
+              <label for="taskBlocked" style="font-size:0.85rem">⏳ منتظر پاسخ دیگران</label>
+            </div>
+            <div id="blockedDeadlineWrap" class="mt-2 hidden">
+              <label class="form-label">ددلاین پیگیری</label>
+              <input type="date" id="blockedDeadline" class="input">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">لیست مقصد</label>
+            <select id="taskList" class="select">
+              <option value="today">📅 امروز</option>
+              <option value="quick">⚡ سریع (زیر ۱۰ دقیقه)</option>
+              <option value="master">📋 همه کارها</option>
+            </select>
+          </div>
+          
+          <div class="btn-row">
+            <button onclick="hideTaskModal()" class="btn btn-outline">انصراف</button>
+            <button onclick="saveTask()" class="btn btn-primary">ذخیره</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- START PAGE -->
+      <div id="page-start" class="page active">
+        <div class="page-center">
+          <div class="page-content text-center">
+            <div style="font-size: 3.5rem; margin-bottom: 12px;">✅</div>
+            <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">فرمول To-Do List</h1>
+            <p class="text-muted mb-3">برنامه‌ریزی علمی، ساده و بدون استرس</p>
+            
+            <div class="card" style="text-align: right;">
+              <h3 style="font-size: 0.95rem; margin-bottom: 12px; font-weight: 700;">چرا این برنامه متفاوت است؟</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.85rem;">
+                <div class="flex items-center gap-2">
+                  <span style="font-size: 1.2rem;">📚</span>
+                  <span>بر اساس کتاب To-Do List Formula</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span style="font-size: 1.2rem;">7️⃣</span>
+                  <span>حداکثر ۷ کار در روز</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span style="font-size: 1.2rem;">⚡</span>
+                  <span>کارهای سریع جداگانه مدیریت می‌شوند</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span style="font-size: 1.2rem;">🧠</span>
+                  <span>روانشناسی رفتاری برای پایداری</span>
+                </div>
+              </div>
+            </div>
+            
+            <button onclick="startSetup()" class="btn btn-primary mt-3">شروع می‌کنم ←</button>
+            <p class="text-sm text-muted mt-2">فقط ۲ دقیقه وقت می‌گیرد</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- ONBOARDING -->
+      <div id="page-setup" class="page">
+        <div class="page-center">
+          <div class="page-content">
+            <div class="dots" id="dots"></div>
+            
+            <div id="step-1" class="setup-step">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon green">👋</div>
+                  <div>
+                    <h2 class="card-title">سلام! اسم کوچکت چیه؟</h2>
+                    <p class="card-subtitle">برای شخصی‌تر شدن برنامه</p>
+                  </div>
+                </div>
+                <input type="text" id="inputName" class="input mb-3" placeholder="مثلاً: علی، مریم...">
+                <button onclick="nextStep(2)" class="btn btn-primary">ادامه ←</button>
+              </div>
+            </div>
+            
+            <div id="step-2" class="setup-step hidden">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon blue">💎</div>
+                  <div>
+                    <h2 class="card-title">چه چیزهایی برات مهمه؟</h2>
+                    <p class="card-subtitle">۲ تا ۴ ارزش انتخاب کن</p>
+                  </div>
+                </div>
+                <div id="valuesChips" class="chips mb-3">
+                  <span class="chip" data-v="یادگیری">📚 یادگیری</span>
+                  <span class="chip" data-v="سلامتی">💪 سلامتی</span>
+                  <span class="chip" data-v="خانواده">👨‍👩‍👧 خانواده</span>
+                  <span class="chip" data-v="آرامش">🧘 آرامش</span>
+                  <span class="chip" data-v="خلاقیت">🎨 خلاقیت</span>
+                  <span class="chip" data-v="پیشرفت">📈 پیشرفت</span>
+                </div>
+                <div class="flex gap-2 mb-3">
+                  <input type="text" id="customValue" class="input flex-1" placeholder="ارزش دیگه...">
+                  <button onclick="addCustomValue()" class="btn btn-light" style="width:auto;padding:10px 14px">+</button>
+                </div>
+                <div class="btn-row">
+                  <button onclick="prevStep(1)" class="btn btn-outline">→ قبلی</button>
+                  <button onclick="nextStep(3)" class="btn btn-primary">ادامه ←</button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="step-3" class="setup-step hidden">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon yellow">🎭</div>
+                  <div>
+                    <h2 class="card-title">نقش‌های زندگیت چیه؟</h2>
+                    <p class="card-subtitle">کارها رو به نقش‌ها وصل می‌کنیم</p>
+                  </div>
+                </div>
+                <div id="rolesChips" class="chips mb-3">
+                  <span class="chip" data-v="دانشجو">🎓 دانشجو</span>
+                  <span class="chip" data-v="شاغل">💼 شاغل</span>
+                  <span class="chip" data-v="والد">👨‍👧 والد</span>
+                  <span class="chip" data-v="ورزشکار">🏃 ورزشکار</span>
+                  <span class="chip" data-v="هنرمند">🎨 هنرمند</span>
+                </div>
+                <div class="flex gap-2 mb-3">
+                  <input type="text" id="customRole" class="input flex-1" placeholder="نقش دیگه...">
+                  <button onclick="addCustomRole()" class="btn btn-light" style="width:auto;padding:10px 14px">+</button>
+                </div>
+                <div class="btn-row">
+                  <button onclick="prevStep(2)" class="btn btn-outline">→ قبلی</button>
+                  <button onclick="nextStep(4)" class="btn btn-primary">ادامه ←</button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="step-4" class="setup-step hidden">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon green">⏰</div>
+                  <div>
+                    <h2 class="card-title">کی بیشتر انرژی داری؟</h2>
+                    <p class="card-subtitle">کارهای سخت رو اون موقع بذار</p>
+                  </div>
+                </div>
+                <div class="chips mb-3" id="energyChips">
+                  <span class="chip" data-v="morning">🌅 صبح</span>
+                  <span class="chip selected" data-v="afternoon">☀️ بعدازظهر</span>
+                  <span class="chip" data-v="evening">🌙 شب</span>
+                </div>
+                <div class="btn-row">
+                  <button onclick="prevStep(3)" class="btn btn-outline">→ قبلی</button>
+                  <button onclick="nextStep(5)" class="btn btn-primary">ادامه ←</button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="step-5" class="setup-step hidden">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-icon blue">🌱</div>
+                  <div>
+                    <h2 class="card-title">جمله هویتی تو</h2>
+                    <p class="card-subtitle">این یادآور مسیرته</p>
+                  </div>
+                </div>
+                <div style="background: var(--primary-light); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                  <p id="identityPreview" style="font-size: 0.9rem; line-height: 1.7;"></p>
+                </div>
+                <textarea id="inputIdentity" class="textarea mb-3" rows="2" placeholder="می‌تونی ویرایشش کنی..."></textarea>
+                <div class="btn-row">
+                  <button onclick="prevStep(4)" class="btn btn-outline">→ قبلی</button>
+                  <button onclick="finishSetup()" class="btn btn-primary">شروع! 🎉</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- TODAY PAGE -->
+      <div id="page-today" class="page">
+        <div class="welcome-banner">
+          <h2>سلام <span id="userName">دوست</span> 👋</h2>
+          <p id="todayDate"></p>
+        </div>
+        
+        <!-- دکمه افزودن سریع در بالا -->
+        <button onclick="showTaskModal()" class="btn btn-primary mb-3">+ افزودن کار جدید</button>
+        
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-num" id="statToday">۰/۷</div>
+            <div class="stat-label">امروز</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="statDone">۰</div>
+            <div class="stat-label">انجام شده</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="statQuick">۰</div>
+            <div class="stat-label">سریع</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" id="statStreak">۰🔥</div>
+            <div class="stat-label">استریک</div>
+          </div>
+        </div>
+        
+        <div class="capacity">
+          <div class="capacity-header">
+            <span>بار کاری امروز</span>
+            <span class="capacity-value" id="capacityValue">۰ از ۸ ساعت</span>
+          </div>
+          <div class="progress">
+            <div class="progress-bar" id="capacityProgress" style="width: 0%"></div>
+          </div>
+        </div>
+        
+        <div class="list-tabs">
+          <button class="list-tab active" data-list="today" onclick="switchList('today')">
+            📅 امروز <span class="badge" id="todayCount">۰</span>
+          </button>
+          <button class="list-tab" data-list="quick" onclick="switchList('quick')">
+            ⚡ سریع <span class="badge" id="quickCount">۰</span>
+          </button>
+        </div>
+        
+        <div id="todayList" class="task-list"></div>
+        <div id="quickList" class="task-list hidden"></div>
+        
+        <!-- Daily Review -->
+        <div class="card mt-3">
+          <div class="card-header">
+            <div class="card-icon blue">📝</div>
+            <div>
+              <h2 class="card-title">مرور آخر روز</h2>
+              <p class="card-subtitle">۳ سوال ساده برای یادگیری</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">چی خوب پیش رفت؟ ✅</label>
+            <textarea id="reviewGood" class="textarea" rows="2" placeholder="حتی کارهای کوچک..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">چی می‌تونست بهتر باشه؟ 🤔</label>
+            <textarea id="reviewBetter" class="textarea" rows="2" placeholder="بدون سرزنش، فقط کنجکاوی..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">فردا یه تغییر کوچک؟ 💡</label>
+            <input type="text" id="reviewTomorrow" class="input" placeholder="یه چیز ساده برای امتحان">
+          </div>
+          <button onclick="saveDailyReview()" class="btn btn-secondary">ذخیره مرور امروز</button>
+        </div>
+      </div>
+      
+      <!-- BRAIN DUMP PAGE -->
+      <div id="page-brain" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">🧠</div>
+            <div>
+              <h2 class="card-title">تخلیه ذهن</h2>
+              <p class="card-subtitle">هر چیزی که در ذهنت هست رو بریز بیرون</p>
+            </div>
+          </div>
+          <textarea id="brainDumpText" class="textarea mb-3" rows="5" placeholder="هر خط = یه فکر، کار، نگرانی..."></textarea>
+          <button onclick="saveBrainDump()" class="btn btn-primary mb-2">💾 ذخیره در تخلیه ذهن</button>
+          <button onclick="processBrainDump()" class="btn btn-light">📋 انتقال به لیست کارها</button>
+        </div>
+        
+        <!-- لیست ذخیره شده تخلیه ذهن -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon gray">📝</div>
+            <div>
+              <h2 class="card-title">یادداشت‌های ذهنی</h2>
+              <p class="card-subtitle">فکرهایی که ذخیره کردی</p>
+            </div>
+          </div>
+          <div id="brainDumpList"></div>
+        </div>
+      </div>
+      
+      <!-- ALL TASKS PAGE -->
+      <div id="page-all" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">📋</div>
+            <div>
+              <h2 class="card-title">همه کارها</h2>
+              <p class="card-subtitle">لیست اصلی کارها (Master List)</p>
+            </div>
+          </div>
+          <div id="masterList"></div>
+          <button onclick="showTaskModal('master')" class="btn btn-primary mt-2">+ افزودن به لیست اصلی</button>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">📊</div>
+            <div>
+              <h2 class="card-title">آمار این هفته</h2>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-num" id="wkDone">۰</div>
+              <div class="stat-label">انجام شده</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="wkPlan">۰</div>
+              <div class="stat-label">برنامه‌ریزی</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="wkDays">۰</div>
+              <div class="stat-label">روز فعال</div>
+            </div>
+            <div class="stat">
+              <div class="stat-num" id="wkPercent">۰٪</div>
+              <div class="stat-label">موفقیت</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon yellow">🔍</div>
+            <div>
+              <h2 class="card-title">هرس کارهای قدیمی</h2>
+              <p class="card-subtitle">کارهایی که بیش از یک هفته هست ایجاد شدن</p>
+            </div>
+          </div>
+          <div id="staleTasksList"></div>
+          <button onclick="pruneOldTasks()" class="btn btn-warning mt-2">🗑️ پاکسازی کارهای کهنه</button>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">🧪</div>
+            <div>
+              <h2 class="card-title">مرور هفتگی</h2>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">این هفته چه پیشرفتی داشتم؟</label>
+            <textarea id="weekProgress" class="textarea" rows="2" placeholder="حتی کوچک‌ترین پیشرفت‌ها..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">موانع اصلی چی بود؟</label>
+            <div class="chips mb-2" id="obstacleChips">
+              <span class="chip" data-v="خستگی">😴 خستگی</span>
+              <span class="chip" data-v="حواس‌پرتی">📱 حواس‌پرتی</span>
+              <span class="chip" data-v="کمال‌گرایی">🎯 کمال‌گرایی</span>
+              <span class="chip" data-v="اتفاقات">🌀 اتفاقات</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">هفته بعد یه آزمایش کوچک؟</label>
+            <input type="text" id="weekExperiment" class="input" placeholder="مثلاً: صبح‌ها زودتر شروع کنم">
+          </div>
+          <button onclick="saveWeeklyReview()" class="btn btn-secondary">ذخیره مرور هفتگی</button>
+        </div>
+        
+        <!-- Review History -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon gray">📜</div>
+            <div>
+              <h2 class="card-title">تاریخچه مرورها</h2>
+            </div>
+          </div>
+          <div id="reviewHistory"></div>
+        </div>
+      </div>
+      
+      <!-- HABITS PAGE -->
+      <div id="page-habits" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">🔗</div>
+            <div>
+              <h2 class="card-title">عادت‌های کوچک</h2>
+              <p class="card-subtitle">بعد از X، فقط Y می‌کنم</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">بعد از اینکه...</label>
+            <div class="flex gap-2">
+              <input type="text" id="habitAnchor" class="input" placeholder="صبحانه می‌خورم">
+              <select id="habitTaskSelect" class="select" style="width: 40%; font-size: 0.8rem;" onchange="if(this.value) document.getElementById('habitAnchor').value = 'انجام کار «' + this.value + '»'">
+                <option value="">انتخاب از کارهای امروز...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">فقط...</label>
+            <input type="text" id="habitBehavior" class="input" placeholder="۲ دقیقه برنامه می‌نویسم">
+          </div>
+          <button onclick="addHabit()" class="btn btn-primary mb-3">+ افزودن عادت</button>
+          <div id="habitsList"></div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon yellow">⚡</div>
+            <div>
+              <h2 class="card-title">اگر... آنگاه...</h2>
+              <p class="card-subtitle">از قبل تصمیم بگیر</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">اگر...</label>
+            <div class="flex gap-2">
+              <input type="text" id="ifCond" class="input" placeholder="حوصله‌ام نبود">
+              <select id="ifTaskSelect" class="select" style="width: 40%; font-size: 0.8rem;" onchange="document.getElementById('ifCond').value = 'برای کار «' + this.options[this.selectedIndex].text + '» مشکلی پیش آمد'">
+                <option value="">انتخاب از کارهای امروز...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">آنگاه...</label>
+            <input type="text" id="thenAct" class="input" placeholder="فقط ۵ دقیقه شروع می‌کنم">
+          </div>
+          <button onclick="addIfThen()" class="btn btn-secondary mb-3">+ افزودن قانون</button>
+          <div id="ifThenList"></div>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">⭐</div>
+            <div>
+              <h2 class="card-title">WOOP</h2>
+              <p class="card-subtitle">آرزو ← نتیجه ← مانع ← برنامه</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">🌟 آرزو</label>
+            <input type="text" id="woopW" class="input" placeholder="هر روز ۳۰ دقیقه مطالعه">
+          </div>
+          <div class="form-group">
+            <label class="form-label">✨ نتیجه</label>
+            <input type="text" id="woopO" class="input" placeholder="حس پیشرفت و آرامش">
+          </div>
+          <div class="form-group">
+            <label class="form-label">🚧 مانع</label>
+            <input type="text" id="woopOb" class="input" placeholder="خستگی بعد از کار">
+          </div>
+          <div class="form-group">
+            <label class="form-label">📋 برنامه</label>
+            <input type="text" id="woopP" class="input" placeholder="فقط ۵ دقیقه شروع می‌کنم">
+          </div>
+          <button onclick="addWoop()" class="btn btn-primary mb-3">+ افزودن هدف</button>
+          <div id="woopList"></div>
+        </div>
+      </div>
+      
+      <!-- PROJECTS PAGE -->
+      <div id="page-projects" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">🎯</div>
+            <div>
+              <h2 class="card-title">پروژه‌ها</h2>
+              <p class="card-subtitle">پروژه = مجموعه‌ای از کارهای کوچک</p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">نام پروژه</label>
+            <input type="text" id="projectName" class="input" placeholder="مثال: پایان‌نامه، سایت جدید...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">هدف نهایی</label>
+            <input type="text" id="projectGoal" class="input" placeholder="وقتی تمام شد چه نتیجه‌ای دارم؟">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ددلاین</label>
+            <input type="date" id="projectDeadline" class="input">
+          </div>
+          <button onclick="addProject()" class="btn btn-primary mb-3">+ افزودن پروژه</button>
+          <div id="projectsList"></div>
+        </div>
+        
+        <div class="card" style="background: var(--secondary-light); border: none;">
+          <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 8px;">💡 نکته مهم</h3>
+          <p style="font-size: 0.85rem; line-height: 1.7;">پروژه چیزی مثل «پایان‌نامه» یا «لاغر شدن» است. این‌ها کار نیستند! باید به کارهای کوچک ۱۵-۶۰ دقیقه‌ای بشکنی.</p>
+        </div>
+      </div>
+      
+      <!-- AI PAGE -->
+      <div id="page-ai" class="page">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon blue">🤖</div>
+            <div>
+              <h2 class="card-title">تحلیل با هوش مصنوعی</h2>
+              <p class="card-subtitle">پرامپت رو کپی کن و بفرست به ChatGPT</p>
+            </div>
+          </div>
+          <button onclick="generatePrompt()" class="btn btn-primary mb-3">🔮 ساختن پرامپت تحلیل</button>
+          <div id="promptBox" class="prompt-box hidden"></div>
+          <button onclick="copyPrompt()" id="copyPromptBtn" class="btn btn-secondary mt-2 hidden">📋 کپی کردن پرامپت</button>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon gray">💡</div>
+            <div>
+              <h2 class="card-title">سوالات پیشنهادی</h2>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="tiny-task" onclick="copyQuestion(this)">
+              <span class="tiny-task-text">چطور می‌تونم عادت برنامه‌ریزی روزانه رو تثبیت کنم؟</span>
+              <span>📋</span>
+            </div>
+            <div class="tiny-task" onclick="copyQuestion(this)">
+              <span class="tiny-task-text">با توجه به موانعم، چه راه‌حلی پیشنهاد میدی؟</span>
+              <span>📋</span>
+            </div>
+            <div class="tiny-task" onclick="copyQuestion(this)">
+              <span class="tiny-task-text">یه برنامه ۲ هفته‌ای برای بهبود بهم بده</span>
+              <span>📋</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- SETTINGS PAGE -->
+      <div id="page-settings" class="page">
+        <div class="card" style="border: 2px solid var(--warning);">
+          <div class="card-header">
+            <div class="card-icon yellow">💾</div>
+            <div>
+              <h2 class="card-title">پشتیبان‌گیری</h2>
+              <p class="card-subtitle">هفته‌ای یه بار بکاپ بگیر!</p>
+            </div>
+          </div>
+          <button onclick="downloadBackup()" class="btn btn-primary mb-2">📥 دانلود بکاپ</button>
+          <button onclick="copyBackup()" class="btn btn-warning mb-2">📋 کپی متن بکاپ</button>
+          <label class="btn btn-light mb-2" style="cursor:pointer">
+            📤 بازیابی از فایل
+            <input type="file" accept=".json,.txt" style="display:none" onchange="handleImport(this)">
+          </label>
+        </div>
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon gray">⚙️</div>
+            <div>
+              <h2 class="card-title">تنظیمات</h2>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">حالت نمایش</label>
+            <button onclick="toggleTheme()" class="btn btn-outline" id="themeBtnSettings">🌙 حالت تاریک</button>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">اسم</label>
+            <input type="text" id="setName" class="input">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">جمله هویتی</label>
+            <textarea id="setIdentity" class="textarea" rows="2"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">ارزش‌ها (کلیک = حذف)</label>
+            <div id="settingsValues" class="chips mb-2"></div>
+            <div class="flex gap-2">
+              <input type="text" id="addValueInput" class="input flex-1" placeholder="ارزش جدید...">
+              <button onclick="addSettingValue()" class="btn btn-light" style="width:auto;padding:10px 14px">+</button>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">نقش‌ها</label>
+            <div id="settingsRoles" class="chips mb-2"></div>
+            <div class="flex gap-2">
+              <input type="text" id="addRoleInput" class="input flex-1" placeholder="نقش جدید...">
+              <button onclick="addSettingRole()" class="btn btn-light" style="width:auto;padding:10px 14px">+</button>
+            </div>
+          </div>
+          
+          <button onclick="saveSettings()" class="btn btn-primary mb-3">ذخیره تنظیمات</button>
+          
+          <div class="btn-row">
+            <button onclick="doResetSetup()" class="btn btn-outline">🔄 شروع مجدد</button>
+            <button onclick="doClearAll()" class="btn btn-danger">🗑️ پاک کردن همه</button>
+          </div>
+        </div>
+        
+        <!-- LEARN SECTION -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon green">📚</div>
+            <div>
+              <h2 class="card-title">یادگیری و راهنما</h2>
+              <p class="card-subtitle">اصول فرمول To-Do + کوچینگ</p>
+            </div>
+          </div>
+          
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>💡 ۱. مشکل سیستم است، نه تو</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>اگر کارهایت می‌ماند، مشکل از اراده‌ات نیست، از روش لیست‌نویسی است. این سیستم طوری طراحی شده که واقع‌بینانه باشد.</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>📥 ۲. لیست مرجع (Master List)</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>ذهن جای نگه‌داشتن کارها نیست. همه چیز را در «همه کارها» بنویس. این مغز دوم توست.</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>📅 ۳. لیست امروز ≠ لیست مرجع</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>لیست مرجع شامل همه‌چیز است. لیست امروز فقط شامل کارهایی است که واقعاً امروز وقت می‌کنی (حدود ۷ کار).</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>7️⃣ ۴. قانون ۷ کار</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>مغز با گزینه‌های زیاد فلج می‌شود. حداکثر ۷ کار مهم (بالای ۱۵ دقیقه) برای امروز انتخاب کن. کارهای ریز جدا هستند.</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>⚡ ۵. کارهای سریع (Tiny Tasks)</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>کارهای زیر ۱۰ دقیقه (مثل تماس، پیام) را قاطی کارهای مهم نکن. آن‌ها را در لیست «سریع» نگه دار و وقتی وقت مرده داشتی انجام بده.</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>🎯 ۶. کار ≠ پروژه</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>«پایان‌نامه» پروژه است. «نوشتن یک صفحه» کار است. پروژه‌ها را در تب پروژه‌ها بساز و به کارهای کوچک بشکن.</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>⏱️ ۷. قانون ۱.۵ برابر</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>ما همیشه زمان را دست‌کم می‌گیریم. این برنامه زمان تخمینی تو را در ۱.۵ ضرب می‌کند تا برنامه‌ات واقعی‌تر شود.</p>
+            </div>
+          </div>
+          
+          <div style="margin: 12px 0; border-top: 1px dashed var(--border);"></div>
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px;">🧠 اصول روانشناسی</h3>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>🪞 هویت و عادت</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>به جای «می‌خواهم ورزش کنم»، بگو «من ورزشکارم». هویت، عادت می‌سازد. (James Clear)</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>🔗 عادت‌های کوچک (Tiny Habits)</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>رفتار جدید را به رفتار قدیمی وصل کن: «بعد از مسواک (قدیمی)، نخ دندان می‌کشم (جدید)». (BJ Fogg)</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>⚡ اگر... آنگاه...</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>برای موانع آماده باش: «اگر خسته بودم، آنگاه فقط ۵ دقیقه کار می‌کنم». (Implementation Intentions)</p>
+            </div>
+          </div>
+
+          <div class="accordion" onclick="this.classList.toggle('open')">
+            <div class="accordion-header"><span>⭐ WOOP</span><span class="accordion-icon">▼</span></div>
+            <div class="accordion-body">
+              <p>Wish (آرزو) → Outcome (نتیجه) → Obstacle (مانع) → Plan (برنامه). مانع را ببین و برایش پلن داشته باش.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- در یک نگاه -->
+        <div class="card" style="background: var(--primary-light); border: none;">
+          <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;">🎯 این سیستم در یک نگاه</h3>
+          <div style="font-size: 0.85rem; line-height: 1.8;">
+            <p>• همه کارها → لیست مرجع (Master List)</p>
+            <p>• هر روز حداکثر ~۷ کار جدی انتخاب کن</p>
+            <p>• کارهای ریز (زیر ۱۰ دقیقه) جدا نگه‌دار</p>
+            <p>• پروژه‌ها → شکستن به کارهای کوچک</p>
+            <p>• مرور منظم = رشد پیوسته</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۱ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>💡 مشکل تو «بی‌ارادگی» نیست</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>اگر همیشه احساس می‌کنی کلی کار ناتمام داری، احتمالاً مشکل از <strong>لیست‌نویسی</strong> توست، نه از اراده یا شخصیتت.</p>
+            <p style="margin-top: 8px;">فرمول زاهاریادس یک چارچوب می‌دهد که لیست‌هایت <strong>واقعاً قابل‌اجرا</strong> شوند. قرار نیست «خودت» را عوض کنی، بلکه «روش لیست‌نویسی» را.</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۲ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>📥 لیست مرجع = مغز دوم</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>ذهن جای «نگه‌داشتنِ» کارها نیست؛ فقط برای «فکر کردن» ساخته شده.</p>
+            <p style="margin-top: 8px;">هر کاری که به ذهن‌ات می‌آید – از کوچک‌ترین تا بزرگ‌ترین – اول باید یک جا ثبت شود. اینجا به آن می‌گوییم «لیست مرجع»؛ مثل یک <strong>مغز دوم</strong>، که خیال‌ات را راحت می‌کند چیزی را فراموش نکنی.</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۳ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>📅 فرق «لیست مرجع» با «لیست امروز»</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>اشتباه رایج این است که لیستِ همه‌چیز را به‌عنوان «برنامه امروز» نگاه می‌کنیم.</p>
+            <p style="margin-top: 8px;"><strong>لیست مرجع</strong> = همه کارهای فعلی و آینده</p>
+            <p><strong>لیست امروز</strong> = حداکثر چند کار محدود که امروز قرار است واقعاً برایشان وقت بگذاری.</p>
+            <p style="margin-top: 8px;">نرم‌افزار به تو کمک می‌کند این دو را از هم جدا نگه داری.</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۴ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🔨 «کار» با «پروژه» فرق دارد</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>چیزهایی مثل «پایان‌نامه»، «سایت»، «لاغر شدن» <strong>پروژه‌</strong>اند، نه کار.</p>
+            <p style="margin-top: 8px;">کار باید <strong>کوچک، مشخص و قابل انجام در یک نشست معقول</strong> (مثلاً ۱۵–۶۰ دقیقه) باشد.</p>
+            <p style="margin-top: 8px;">هر وقت چیزی در لیستت آن‌قدر بزرگ است که نمی‌دانی از کجا شروع کنی، یعنی با یک «پروژه» طرفی. پروژه‌ها را به کارهای کوچک‌تر بشکن.</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۵ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>7️⃣ حداکثر ۷ کار جدی در روز</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>لیست امروزت نباید بشود ۲۰–۳۰ مورد!</p>
+            <p style="margin-top: 8px;">طبق فرمول، حداکثر حدود <strong>۷ کار جدی</strong> (هرکدام حداقل ~۱۵ دقیقه) برای روز کافی است. باقی کارها یا می‌روند در لیست «کارهای سریع» یا می‌مانند برای روزهای دیگر.</p>
+            <p style="margin-top: 8px;"><strong>چرا ۷؟</strong> چون مغز در مقابل گزینه‌های زیاد فلج می‌شود. محدودیت کمّی، تمرکز و احساس پیروزی را بالا می‌برد.</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۶ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⚡ جداسازی کارهای سریع</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>کارهای زیر ۱۰ دقیقه (مثل: جواب دادن یک ایمیل، فرستادن یک فایل) را نباید قاطی کارهای اصلی روز کرد.</p>
+            <p style="margin-top: 8px;">این نرم‌افزار چنین کارهایی را در یک <strong>«لیست کارهای سریع»</strong> جدا جمع می‌کند، تا وقتی چند دقیقه‌ی خالی داشتی، بروی سراغ آن‌ها.</p>
+            <p style="margin-top: 8px;">اگر بیایند در لیست اصلی روز، هم جا می‌گیرند، هم تو را گول می‌زنند که «خیلی کار کرده‌ای»!</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۷ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⏱️ ددلاین و تخمین زمان</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>هر کار بدون تاریخ و بدون تخمین زمان، به‌راحتی هفته‌ها در لیست خاک می‌خورد.</p>
+            <p style="margin-top: 8px;">برای هر کار، یک «حدس زمان» بزن (مثلاً ۱۵، ۳۰، ۴۵ دقیقه)، و اگر شد، یک تاریخ هدف انتخاب کن.</p>
+            <p style="margin-top: 8px;">سیستم کمک می‌کند ببینی آیا حجم کار امروز با زمان و انرژی واقعیت می‌خواند یا نه. (ما خودمان ۱.۵ برابر حساب می‌کنیم چون همه زمان را دست‌کم می‌گیریم!)</p>
+          </div>
+        </div>
+        
+        <!-- نکته اصلی ۸ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🔄 مرور منظم = بخشی از سیستم</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>اگر هیچ‌وقت به لیست‌هایت سر نزنی و تمیزشان نکنی، دوباره همان لیست‌های بی‌مصرف و شلوغ قبلی می‌شوند.</p>
+            <p style="margin-top: 8px;">این نرم‌افزار یک <strong>مرور کوتاه روزانه</strong> و <strong>مرور هفتگی</strong> دارد که کمک می‌کند:</p>
+            <p>• ببینی چه چیز خوب پیش رفت</p>
+            <p>• چه چیز نه</p>
+            <p>• و فردا را کمی واقعی‌تر بچینی</p>
+          </div>
+        </div>
+        
+        <!-- عنوان نکات حرفه‌ای -->
+        <div class="card" style="background: var(--warning-light); border: none; margin-top: 16px;">
+          <h3 style="font-size: 0.95rem; font-weight: 700;">✨ نکات حرفه‌ای</h3>
+          <p style="font-size: 0.8rem; color: var(--text2);">چیزهای کوچکی که تفاوت بزرگ می‌سازند</p>
+        </div>
+        
+        <!-- نکته ریز ۱ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>✍️ شروع با فعل فعال</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>به‌جای «پروژه گزارش»، بنویس: «نوشتن پیش‌نویس بخش اول گزارش»</p>
+            <p style="margin-top: 8px;">سعی کن عنوان هر کار را با یک فعل شروع کنی: «زنگ‌زدن به…»، «نوشتن…»، «مرور کردن…». این‌طوری دقیق می‌دانی باید چه کار کنی.</p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۲ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🎯 کار واقعی vs آرزونامه</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>لیست کار نباید پر از «باید بیشتر فلان کار را بکنم» و «ای‌کاش…» باشد.</p>
+            <p style="margin-top: 8px;">اگر در لیستت چیزهایی مثل «بیشتر کتاب بخوانم» داری، تبدیلش کن به: «خواندن ۱۰ صفحه از کتاب X»</p>
+            <p style="margin-top: 8px;">فرمول با «آرزونامه» کار نمی‌کند؛ فقط با <strong>کارهای قابل انجام</strong>.</p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۳ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⏳ علامت‌گذاری کارهای وابسته</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>بعضی کارها متوقف می‌شوند چون باید منتظر جواب ایمیل، تماس، یا تأیید کسی باشی.</p>
+            <p style="margin-top: 8px;">اگر این‌ها را جدا نکنی، ممکن است از خودت ناراضی شوی، درحالی‌که توپ دست تو نبوده!</p>
+            <p style="margin-top: 8px;">در این نرم‌افزار می‌توانی با یک تیک ساده بگویی «این کار وابسته به دیگران است».</p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۴ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🏷️ دسته‌بندی بر اساس نقش</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>برچسب‌زدن بر اساس نقش (دانشجو، شاغل، والد، ورزشکار) باعث می‌شود در هر موقعیت سریع‌تر بدانی سراغ کدام بروی.</p>
+            <p style="margin-top: 8px;">لازم نیست همیشه با بالاترین تمرکز کار کنی. وقتی خسته‌ای، سراغ کارهای سبک‌تر برو.</p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۵ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🗑️ حذف‌کردن هم بخشی از فرمول است</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>قرار نیست هر کاری که وارد لیست شده تا ابد آنجا بماند.</p>
+            <p style="margin-top: 8px;">گاهی بهترین کار این است که شجاعانه بگویی: «این کار دیگر برایم مهم نیست» و آن را حذف کنی.</p>
+            <p style="margin-top: 8px;">فرمولِ خوب، فقط اضافه نمی‌کند؛ <strong>کم هم می‌کند.</strong></p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۶ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🧹 تمیز نگه‌داشتن لیست مرجع</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>لیست مرجع تو مثل یک «مغز دوم» است. اگر آن را هر از گاهی تمیز نکنی، پر از چیزهای قدیمی و بی‌فایده می‌شود.</p>
+            <p style="margin-top: 8px;">هر چند وقت یک‌بار، چند دقیقه وقت بگذار و چیزهایی را که دیگر برایت مهم نیستند، پاک یا به «روزی روزگاری» منتقل کن.</p>
+          </div>
+        </div>
+        
+        <!-- نکته ریز ۷ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>💚 فرمول خدمتکار توست، نه رئیست</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p>این فرمول قرار نیست رئیس تو باشد؛ قرار است <strong>خدمتکار تو</strong> باشد.</p>
+            <p style="margin-top: 8px;">هرجا دیدی یک قانون، بیشتر از این‌که کمک کند، تو را فلج می‌کند:</p>
+            <p>• یک قدم برگرد عقب</p>
+            <p>• سبک‌ترش کن</p>
+            <p>• نسخه‌ای بساز که با زندگی تو جورتر است</p>
+            <p style="margin-top: 8px;">مهم، <strong>پیشرفت پیوسته</strong> است، نه اجرای کامل و بی‌نقص فرمول.</p>
+          </div>
+        </div>
+        
+        <!-- عنوان اصول کوچینگ -->
+        <div class="card" style="background: var(--secondary-light); border: none; margin-top: 16px;">
+          <h3 style="font-size: 0.95rem; font-weight: 700;">🧠 اصول کوچینگ و رفتارشناسی</h3>
+          <p style="font-size: 0.8rem; color: var(--text2);">علم پشت این سیستم</p>
+        </div>
+        
+        <!-- اصل کوچینگ ۱ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🪞 هویت و عادت</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Identity-Based Habits (James Clear):</strong></p>
+            <p>به جای «می‌خواهم ورزش کنم»، بگو «من آدمی هستم که سلامتی برایش مهم است».</p>
+            <p style="margin-top: 8px;">تغییر هویت، تغییر رفتار را آسان‌تر می‌کند. وقتی خودت را نوعی آدم می‌دانی، رفتارهایت خودبه‌خود همسو می‌شوند.</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۲ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>💎 ارزش‌ها و معنا</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Self-Concordance Theory:</strong></p>
+            <p>هدف‌هایی که با ارزش‌های واقعی تو هماهنگ باشند، پیگیری‌شان راحت‌تر است و رسیدن بهشان رضایت بیشتری می‌دهد.</p>
+            <p style="margin-top: 8px;">وقتی کارهایت به ارزش‌هایت وصل باشند، انگیزه‌ات درونی‌تر می‌شود.</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۳ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🔗 عادت‌های کوچک</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Tiny Habits (BJ Fogg):</strong></p>
+            <p>وقتی کاری را خنده‌دار کوچک می‌کنی، مقاومت ذهنی‌ات از بین می‌رود.</p>
+            <p style="margin-top: 8px;">«فقط فایل را باز کن» بسیار آسان‌تر از «پایان‌نامه بنویس» است.</p>
+            <p style="margin-top: 8px;"><strong>فرمول:</strong> بعد از [عادت قدیمی]، فقط [عادت کوچک جدید].</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۴ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⚡ اگر... آنگاه...</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Implementation Intentions (Peter Gollwitzer):</strong></p>
+            <p>تحقیقات نشان می‌دهد کسانی که از قبل «اگر-آنگاه» تعریف می‌کنند، ۲-۳ برابر بیشتر به هدف می‌رسند!</p>
+            <p style="margin-top: 8px;">مثال: اگر ساعت ۹ شب شد و برنامه فردا را ننوشتم، آنگاه فقط ۳ دقیقه وقت می‌گذارم.</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۵ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⭐ WOOP</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Mental Contrasting (Gabriele Oettingen):</strong></p>
+            <p>فقط تجسم مثبت کافی نیست! باید موانع را هم ببینی و برایشان برنامه داشته باشی.</p>
+            <p style="margin-top: 8px;"><strong>W</strong>ish (آرزو) → <strong>O</strong>utcome (نتیجه) → <strong>O</strong>bstacle (مانع) → <strong>P</strong>lan (برنامه)</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۶ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>💚 خودشفقتی</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Self-Compassion (Kristin Neff):</strong></p>
+            <p>سرزنش کردن خودت وقتی عقب می‌افتی، کمکی نمی‌کند؛ بلکه بدترش می‌کند.</p>
+            <p style="margin-top: 8px;">با خودت مثل یک دوست خوب رفتار کن. «امروز نشد، فردا دوباره تلاش می‌کنم.»</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۷ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>⏰ مدیریت انرژی</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Chronotype Research:</strong></p>
+            <p>هر کسی یک ریتم شبانه‌روزی دارد. کار کردن <strong>با</strong> این ریتم، نه علیه‌اش، بهره‌وری را چند برابر می‌کند.</p>
+            <p style="margin-top: 8px;">کارهای سخت را وقتی انرژی داری انجام بده، نه وقتی خسته‌ای.</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۸ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🔄 چرخه یادگیری PDCA</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Plan-Do-Check-Act:</strong></p>
+            <p>بهبود مستمر از طریق مرور و تنظیم. هر روز کمی بهتر.</p>
+            <p style="margin-top: 8px;">• <strong>Plan:</strong> برنامه بریز</p>
+            <p>• <strong>Do:</strong> انجام بده</p>
+            <p>• <strong>Check:</strong> مرور کن چه شد</p>
+            <p>• <strong>Act:</strong> تنظیم کن برای دفعه بعد</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۹ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🧠 بار شناختی</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Zeigarnik Effect:</strong></p>
+            <p>ذهن ما کارهای ناتمام را مدام یادآوری می‌کند و انرژی مصرف می‌کند.</p>
+            <p style="margin-top: 8px;">نوشتن روی کاغذ (یا اینجا) این حلقه را می‌بندد و ذهنت را آزاد می‌کند.</p>
+          </div>
+        </div>
+        
+        <!-- اصل کوچینگ ۱۰ -->
+        <div class="accordion" onclick="this.classList.toggle('open')">
+          <div class="accordion-header"><span>🎁 پاداش فوری</span><span class="accordion-icon">▼</span></div>
+          <div class="accordion-body">
+            <p><strong>Temporal Discounting:</strong></p>
+            <p>مغز ما پاداش‌های فوری را به پاداش‌های آینده ترجیح می‌دهد.</p>
+            <p style="margin-top: 8px;">برای همین باید کارها را به قدم‌های کوچک بشکنی تا هر بار حس موفقیت و پاداش بگیری.</p>
+          </div>
+        </div>
+      </div>
+      
+    </main>
+    
+    <nav class="nav hidden" id="nav">
+      <div class="nav-item active" data-page="today">
+        <div class="nav-icon">📅</div>
+        <div class="nav-label">امروز</div>
+      </div>
+      <div class="nav-item" data-page="all">
+        <div class="nav-icon">📋</div>
+        <div class="nav-label">همه کارها</div>
+      </div>
+      
+      <div class="nav-fab-wrapper">
+        <button class="nav-fab" onclick="showTaskModal()">+</button>
+      </div>
+
+      <div class="nav-item" data-page="projects">
+        <div class="nav-icon">🎯</div>
+        <div class="nav-label">پروژه‌ها</div>
+      </div>
+      <div class="nav-item" data-page="habits">
+        <div class="nav-icon">🔗</div>
+        <div class="nav-label">عادت</div>
+      </div>
+    </nav>
+  </div>
+
+<script>
+const STORAGE_KEY = 'todo_formula_v12';
+
+let data = {
+  user: { name: '', values: [], roles: [], identity: '', energy: 'afternoon' },
+  tasks: [],
+  inbox: [],
+  habits: [],
+  ifThens: [],
+  woops: [],
+  projects: [],
+  brainDumps: [],
+  dailyReviews: [],
+  weeklyReviews: [],
+  streak: 0,
+  totalDays: 0,
+  activeDates: [],
+  lastActive: null,
+  setupDone: false,
+  theme: 'light'
+};
+
+let tempValues = [];
+let tempRoles = [];
+let tempObstacles = [];
+let currentStep = 1;
+let currentList = 'today';
+let selectedImportance = 'medium';
+let selectedUrgency = 'medium';
+
+// Storage
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    if ('indexedDB' in window) {
+      const req = indexedDB.open('TodoFormulaDB', 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore('backup');
+      req.onsuccess = e => {
+        try {
+          const tx = e.target.result.transaction('backup', 'readwrite');
+          tx.objectStore('backup').put(JSON.stringify(data), 'data');
+        } catch(err) {}
+      };
+    }
+  } catch(e) { console.error('Save error:', e); }
+}
+
+function loadData() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      data = { ...data, ...parsed };
+      if (parsed.user) data.user = { ...data.user, ...parsed.user };
+      return true;
+    }
+  } catch(e) { console.error('Load error:', e); }
+  return false;
+}
+
+// Utils
+function showToast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function toPersian(n) {
+  return n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+function getPersianDate() {
+  return new Date().toLocaleDateString('fa-IR', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+}
+
+function showConfetti() {
+  const colors = ['#10B981', '#6366F1', '#F59E0B', '#EF4444', '#EC4899'];
+  for (let i = 0; i < 20; i++) {
+    const c = document.createElement('div');
+    c.style.cssText = `position:fixed;width:10px;height:10px;background:${colors[Math.floor(Math.random()*colors.length)]};left:${Math.random()*100}%;top:-10px;border-radius:${Math.random()>0.5?'50%':'2px'};z-index:9999;pointer-events:none;animation:confetti ${2+Math.random()*2}s linear forwards`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
+  }
+}
+
+// Theme
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', data.theme);
+  const btnSettings = document.getElementById('themeBtnSettings');
+  if (btnSettings) btnSettings.textContent = data.theme === 'dark' ? '☀️ حالت روشن' : '🌙 حالت تاریک';
+}
+
+function toggleTheme() {
+  data.theme = data.theme === 'light' ? 'dark' : 'light';
+  applyTheme();
+  saveData();
+}
+
+// Priority selection
+function selectImportance(level) {
+  selectedImportance = level;
+  document.querySelectorAll('#importanceChips .priority-chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.v === level);
+  });
+}
+
+function selectUrgency(level) {
+  selectedUrgency = level;
+  document.querySelectorAll('#urgencyChips .priority-chip').forEach(c => {
+    c.classList.toggle('selected', c.dataset.v === level);
+  });
+}
+
+// Navigation
+function goToPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
+  document.getElementById('main').scrollTop = 0;
+  
+  if (page === 'today') updateTodayPage();
+  if (page === 'all') updateAllPage();
+  if (page === 'habits') updateHabitsPage();
+  if (page === 'brain') updateBrainPage();
+  if (page === 'projects') updateProjectsPage();
+  if (page === 'settings') {
+    updateSettingsPage();
+    applyTheme();
+  }
+}
+
+function showMainApp() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-today').classList.add('active');
+  document.getElementById('header').classList.remove('hidden');
+  document.getElementById('nav').classList.remove('hidden');
+  updateTodayPage();
+}
+
+// Backup
+function showBackupModal() { document.getElementById('backupModal').classList.add('show'); }
+function hideBackupModal() { document.getElementById('backupModal').classList.remove('show'); }
+
+function downloadBackup() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'todo-formula-backup.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('✅ فایل بکاپ دانلود شد');
+  hideBackupModal();
+}
+
+function copyBackup() {
+  navigator.clipboard.writeText(JSON.stringify(data, null, 2))
+    .then(() => showToast('✅ کپی شد'))
+    .catch(() => showToast('❌ خطا در کپی'));
+}
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (parsed.user || parsed.tasks) {
+        data = { ...data, ...parsed };
+        if (parsed.user) data.user = { ...data.user, ...parsed.user };
+        saveData();
+        showToast('✅ بازیابی شد');
+        setTimeout(() => location.reload(), 1000);
+      }
+    } catch(err) { showToast('❌ فایل نامعتبر'); }
+  };
+  reader.readAsText(file);
+}
+
+// Onboarding
+function startSetup() {
+  document.getElementById('page-start').classList.remove('active');
+  document.getElementById('page-setup').classList.add('active');
+  updateDots();
+}
+
+function updateDots() {
+  const dots = document.getElementById('dots');
+  dots.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === currentStep ? ' active' : i < currentStep ? ' done' : '');
+    dots.appendChild(dot);
+  }
+}
+
+function nextStep(step) {
+  if (step === 2) data.user.name = document.getElementById('inputName').value.trim() || 'دوست';
+  if (step === 3) data.user.values = [...tempValues];
+  if (step === 4) data.user.roles = [...tempRoles];
+  if (step === 5) updateIdentityPreview();
+  
+  document.getElementById('step-' + currentStep).classList.add('hidden');
+  document.getElementById('step-' + step).classList.remove('hidden');
+  currentStep = step;
+  updateDots();
+  saveData();
+}
+
+function prevStep(step) {
+  document.getElementById('step-' + currentStep).classList.add('hidden');
+  document.getElementById('step-' + step).classList.remove('hidden');
+  currentStep = step;
+  updateDots();
+}
+
+function addCustomValue() {
+  const input = document.getElementById('customValue');
+  const v = input.value.trim();
+  if (!v || tempValues.includes(v)) return;
+  tempValues.push(v);
+  const chip = document.createElement('span');
+  chip.className = 'chip selected';
+  chip.dataset.v = v;
+  chip.textContent = v;
+  chip.onclick = () => toggleChip(chip, tempValues);
+  document.getElementById('valuesChips').appendChild(chip);
+  input.value = '';
+}
+
+function addCustomRole() {
+  const input = document.getElementById('customRole');
+  const v = input.value.trim();
+  if (!v || tempRoles.includes(v)) return;
+  tempRoles.push(v);
+  const chip = document.createElement('span');
+  chip.className = 'chip selected';
+  chip.dataset.v = v;
+  chip.textContent = v;
+  chip.onclick = () => toggleChip(chip, tempRoles);
+  document.getElementById('rolesChips').appendChild(chip);
+  input.value = '';
+}
+
+function toggleChip(chip, arr) {
+  const v = chip.dataset.v;
+  chip.classList.toggle('selected');
+  if (chip.classList.contains('selected')) {
+    if (!arr.includes(v)) arr.push(v);
+  } else {
+    const idx = arr.indexOf(v);
+    if (idx > -1) arr.splice(idx, 1);
+  }
+}
+
+function updateIdentityPreview() {
+  const name = data.user.name || 'دوست';
+  const values = data.user.values.slice(0, 2).join(' و ') || 'پیشرفت';
+  const text = `من ${name} هستم که ${values} برام مهمه و قدم‌به‌قدم پیش میرم.`;
+  document.getElementById('identityPreview').innerHTML = `«${text}»`;
+  document.getElementById('inputIdentity').value = text;
+  data.user.identity = text;
+}
+
+function finishSetup() {
+  data.user.identity = document.getElementById('inputIdentity').value;
+  data.setupDone = true;
+  data.lastActive = getToday();
+  data.streak = 1;
+  data.totalDays = 1;
+  data.activeDates = [getToday()];
+  saveData();
+  
+  document.getElementById('page-setup').classList.remove('active');
+  showMainApp();
+  showToast('خوش اومدی! 💚');
+  showConfetti();
+}
+
+// Today Page
+function updateTodayPage() {
+  document.getElementById('userName').textContent = data.user.name || 'دوست';
+  document.getElementById('todayDate').textContent = getPersianDate();
+  
+  const todayTasks = data.tasks.filter(t => t.list === 'today' && t.date === getToday());
+  const quickTasks = data.tasks.filter(t => t.list === 'quick');
+  const doneTasks = todayTasks.filter(t => t.completed);
+  
+  document.getElementById('statToday').textContent = toPersian(todayTasks.length) + '/۷';
+  document.getElementById('statDone').textContent = toPersian(doneTasks.length);
+  document.getElementById('statQuick').textContent = toPersian(quickTasks.length);
+  document.getElementById('statStreak').textContent = toPersian(data.streak) + '🔥';
+  
+  const totalMinutes = todayTasks.reduce((sum, t) => sum + (t.adjustedMinutes || 0), 0);
+  const hours = Math.round(totalMinutes / 60 * 10) / 10;
+  const percent = Math.min(100, (hours / 8) * 100);
+  
+  document.getElementById('capacityValue').textContent = `${toPersian(hours)} از ۸ ساعت`;
+  document.getElementById('capacityValue').className = 'capacity-value' + (percent > 100 ? ' danger' : percent > 80 ? ' warning' : '');
+  document.getElementById('capacityProgress').style.width = percent + '%';
+  
+  document.getElementById('todayCount').textContent = toPersian(todayTasks.length);
+  document.getElementById('quickCount').textContent = toPersian(quickTasks.length);
+  
+  updateRoleSelect();
+  renderTasks();
+  updateStreak();
+}
+
+function updateRoleSelect() {
+  const roleSelect = document.getElementById('taskRole');
+  roleSelect.innerHTML = '<option value="">بدون نقش</option>' + 
+    data.user.roles.map(r => `<option value="${r}">${r}</option>`).join('');
+}
+
+function updateProjectSelect() {
+  const projectSelect = document.getElementById('taskProject');
+  if(!data.projects) data.projects = [];
+  projectSelect.innerHTML = '<option value="">-- بدون پروژه --</option>' + 
+    data.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+function switchList(list) {
+  currentList = list;
+  document.querySelectorAll('.list-tab').forEach(t => t.classList.toggle('active', t.dataset.list === list));
+  document.querySelectorAll('.task-list').forEach(l => l.classList.add('hidden'));
+  document.getElementById(list + 'List').classList.remove('hidden');
+  renderTasks();
+}
+
+function renderTasks() {
+  const today = getToday();
+  let tasks;
+  let container;
+  
+  if (currentList === 'today') {
+    tasks = data.tasks.filter(t => t.list === 'today' && t.date === today);
+    container = document.getElementById('todayList');
+  } else if (currentList === 'quick') {
+    tasks = data.tasks.filter(t => t.list === 'quick');
+    container = document.getElementById('quickList');
+  } else {
+    tasks = data.tasks.filter(t => t.list === 'master');
+    container = document.getElementById('masterList');
+  }
+  
+  if (!tasks.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">${currentList === 'quick' ? '⚡' : '📋'}</div><div class="empty-text">هنوز کاری نداری</div></div>`;
+    return;
+  }
+  
+  // Sort by importance then urgency
+  const order = { high: 0, medium: 1, low: 2 };
+  tasks.sort((a, b) => (order[a.importance] || 1) - (order[b.importance] || 1));
+  
+  container.innerHTML = tasks.map(task => {
+    const classes = ['task'];
+    if (task.completed) classes.push('done');
+    if (task.importance) classes.push('importance-' + task.importance);
+    if (task.blocked) classes.push('blocked');
+    
+    const importanceEmoji = task.importance === 'high' ? '🔴' : task.importance === 'low' ? '🟢' : '🟡';
+    const urgencyEmoji = task.urgency === 'high' ? '🏃' : task.urgency === 'low' ? '🐢' : '🚶';
+    
+    // Find project name
+    const project = task.projectId ? data.projects.find(p => p.id === task.projectId) : null;
+    
+    return `
+      <div class="${classes.join(' ')}" onclick="editTask('${task.id}')">
+        <div class="task-check ${task.completed ? 'checked' : ''}" onclick="event.stopPropagation(); toggleTask('${task.id}')">${task.completed ? '✓' : ''}</div>
+        <div class="task-content">
+          <div class="task-title">${task.title}</div>
+          <div class="task-meta">
+            <span class="tag">${importanceEmoji}</span>
+            <span class="tag">${urgencyEmoji}</span>
+            ${project ? `<span class="tag orange">🎯 ${project.name}</span>` : ''}
+            ${task.blocked ? '<span class="tag orange">⏳ منتظر</span>' : ''}
+            ${task.role ? `<span class="tag blue">${task.role}</span>` : ''}
+            ${task.adjustedMinutes ? `<span class="tag">${toPersian(task.adjustedMinutes)}د</span>` : ''}
+          </div>
+        </div>
+        <div class="task-actions">
+          ${task.list === 'master' ? `<button class="task-btn" onclick="event.stopPropagation(); moveToToday('${task.id}')">📅</button>` : ''}
+          <button class="task-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Task Modal
+function showTaskModal(defaultList) {
+  document.getElementById('editTaskId').value = '';
+  document.getElementById('taskModalTitle').textContent = '➕ افزودن کار جدید';
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskOutcome').value = '';
+  document.getElementById('taskNotes').value = '';
+  document.getElementById('taskTime').value = '30';
+  document.getElementById('taskDeadline').value = getToday();
+  document.getElementById('taskBlocked').checked = false;
+  document.getElementById('blockedDeadline').value = '';
+  document.getElementById('blockedDeadlineWrap').classList.add('hidden');
+  document.getElementById('taskList').value = defaultList || 'today';
+  
+  selectImportance('medium');
+  selectUrgency('medium');
+  updateRoleSelect();
+  updateProjectSelect(); // Populate project dropdown
+  document.getElementById('taskProject').value = '';
+
+  const todayTasks = data.tasks.filter(t => t.list === 'today' && t.date === getToday());
+  if (todayTasks.length >= 7 && !defaultList) {
+    showToast('⚠️ حداکثر ۷ کار در روز! به لیست اصلی اضافه کن.');
+    document.getElementById('taskList').value = 'master';
+  }
+  
+  document.getElementById('taskModal').classList.add('show');
+}
+
+function hideTaskModal() {
+  document.getElementById('taskModal').classList.remove('show');
+}
+
+function editTask(id) {
+  const task = data.tasks.find(t => t.id === id);
+  if (!task) return;
+  
+  document.getElementById('editTaskId').value = id;
+  document.getElementById('taskModalTitle').textContent = '✏️ ویرایش کار';
+  document.getElementById('taskTitle').value = task.title;
+  document.getElementById('taskOutcome').value = task.outcome || '';
+  document.getElementById('taskNotes').value = task.notes || '';
+  document.getElementById('taskTime').value = task.estimatedMinutes || 30;
+  document.getElementById('taskDeadline').value = task.deadline || '';
+  document.getElementById('taskBlocked').checked = task.blocked || false;
+  document.getElementById('blockedDeadline').value = task.blockedDeadline || '';
+  document.getElementById('blockedDeadlineWrap').classList.toggle('hidden', !task.blocked);
+  document.getElementById('taskList').value = task.list;
+  
+  selectImportance(task.importance || 'medium');
+  selectUrgency(task.urgency || 'medium');
+  updateRoleSelect();
+  updateProjectSelect();
+  document.getElementById('taskRole').value = task.role || '';
+  document.getElementById('taskProject').value = task.projectId || '';
+  
+  document.getElementById('taskModal').classList.add('show');
+}
+
+function saveTask() {
+  const title = document.getElementById('taskTitle').value.trim();
+  if (!title) return showToast('عنوان رو وارد کن');
+  
+  const editId = document.getElementById('editTaskId').value;
+  const estimatedMinutes = parseInt(document.getElementById('taskTime').value) || 30;
+  const listType = document.getElementById('taskList').value;
+  
+  // Check 7 task limit for today
+  if (listType === 'today' && !editId) {
+    const todayTasks = data.tasks.filter(t => t.list === 'today' && t.date === getToday());
+    if (todayTasks.length >= 7) {
+      showToast('⚠️ حداکثر ۷ کار! به لیست اصلی اضافه کن.');
+      return;
+    }
+  }
+  
+  const taskData = {
+    title,
+    outcome: document.getElementById('taskOutcome').value.trim(),
+    notes: document.getElementById('taskNotes').value.trim(),
+    estimatedMinutes,
+    adjustedMinutes: Math.round(estimatedMinutes * 1.5),
+    deadline: document.getElementById('taskDeadline').value,
+    role: document.getElementById('taskRole').value,
+    importance: selectedImportance,
+    urgency: selectedUrgency,
+    blocked: document.getElementById('taskBlocked').checked,
+    blockedDeadline: document.getElementById('blockedDeadline').value,
+    projectId: document.getElementById('taskProject').value,
+    list: listType,
+    date: listType === 'today' ? getToday() : null
+  };
+  
+  if (editId) {
+    const idx = data.tasks.findIndex(t => t.id === editId);
+    if (idx > -1) {
+      data.tasks[idx] = { ...data.tasks[idx], ...taskData };
+    }
+  } else {
+    data.tasks.push({
+      id: Date.now().toString(),
+      ...taskData,
+      completed: false,
+      createdAt: new Date().toISOString()
+    });
+  }
+  
+  saveData();
+  hideTaskModal();
+  updateTodayPage();
+  if (currentList === 'master') renderMasterList();
+  showToast(editId ? '✅ ویرایش شد' : '✅ کار اضافه شد');
+}
+
+function toggleTask(id) {
+  const task = data.tasks.find(t => t.id === id);
+  if (task) {
+    task.completed = !task.completed;
+    saveData();
+    renderTasks();
+    updateTodayPage();
+    if (task.completed) {
+      showConfetti();
+      showToast('🎉 آفرین!');
+    }
+  }
+}
+
+function deleteTask(id) {
+  if (!confirm('حذف این کار؟')) return;
+  data.tasks = data.tasks.filter(t => t.id !== id);
+  saveData();
+  renderTasks();
+  updateTodayPage();
+  if (currentList === 'master') renderMasterList();
+}
+
+function moveToToday(id) {
+  const todayTasks = data.tasks.filter(t => t.list === 'today' && t.date === getToday());
+  if (todayTasks.length >= 7) {
+    showToast('⚠️ حداکثر ۷ کار در روز!');
+    return;
+  }
+  
+  const task = data.tasks.find(t => t.id === id);
+  if (task) {
+    task.list = 'today';
+    task.date = getToday();
+    saveData();
+    renderMasterList();
+    showToast('✅ به امروز منتقل شد');
+  }
+}
+
+function updateStreak() {
+  const today = getToday();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  
+  if (!data.activeDates.includes(today)) {
+    data.activeDates.push(today);
+    data.totalDays++;
+  }
+  
+  if (data.lastActive === yesterday) {
+    if (data.lastActive !== today) {
+      data.streak++;
+      data.lastActive = today;
+    }
+  } else if (data.lastActive !== today) {
+    data.streak = 1;
+    data.lastActive = today;
+  }
+  saveData();
+}
+
+// Blocked checkbox
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('taskBlocked')?.addEventListener('change', function() {
+    document.getElementById('blockedDeadlineWrap').classList.toggle('hidden', !this.checked);
+  });
+});
+
+// Daily Review
+function saveDailyReview() {
+  const good = document.getElementById('reviewGood').value.trim();
+  const better = document.getElementById('reviewBetter').value.trim();
+  const tomorrow = document.getElementById('reviewTomorrow').value.trim();
+  
+  if (!good && !better && !tomorrow) {
+    showToast('حداقل یه چیز بنویس!');
+    return;
+  }
+  
+  data.dailyReviews.push({
+    date: getToday(),
+    good, better, tomorrow,
+    createdAt: new Date().toISOString()
+  });
+  
+  document.getElementById('reviewGood').value = '';
+  document.getElementById('reviewBetter').value = '';
+  document.getElementById('reviewTomorrow').value = '';
+  
+  saveData();
+  showToast('✅ مرور امروز ذخیره شد');
+}
+
+// Brain Dump
+function updateBrainPage() {
+  renderBrainDumps();
+}
+
+function saveBrainDump() {
+  const text = document.getElementById('brainDumpText').value.trim();
+  if (!text) return showToast('چیزی بنویس!');
+  
+  if (!data.brainDumps) data.brainDumps = [];
+  data.brainDumps.push({
+    id: Date.now().toString(),
+    text,
+    createdAt: new Date().toISOString()
+  });
+  
+  saveData();
+  document.getElementById('brainDumpText').value = '';
+  renderBrainDumps();
+  showToast('✅ ذخیره شد');
+}
+
+function processBrainDump() {
+  const text = document.getElementById('brainDumpText').value.trim();
+  if (!text) return showToast('چیزی بنویس!');
+  
+  const lines = text.split('\n').filter(l => l.trim());
+  lines.forEach(line => {
+    data.tasks.push({
+      id: Date.now().toString() + Math.random(),
+      title: line.trim(),
+      outcome: '',
+      notes: '',
+      estimatedMinutes: 30,
+      adjustedMinutes: 45,
+      importance: 'medium',
+      urgency: 'medium',
+      blocked: false,
+      completed: false,
+      list: 'master',
+      needsEdit: true,
+      createdAt: new Date().toISOString()
+    });
+  });
+  
+  saveData();
+  document.getElementById('brainDumpText').value = '';
+  showToast(`✅ ${toPersian(lines.length)} کار به لیست اصلی اضافه شد (نیاز به ویرایش)`);
+}
+
+function renderBrainDumps() {
+  const container = document.getElementById('brainDumpList');
+  if (!data.brainDumps?.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-text">هنوز یادداشتی نداری</div></div>`;
+    return;
+  }
+  
+  container.innerHTML = data.brainDumps.slice().reverse().map(item => `
+    <div class="tiny-task">
+      <span class="tiny-task-text">${item.text.substring(0, 50)}${item.text.length > 50 ? '...' : ''}</span>
+      <button class="task-btn" onclick="deleteBrainDump('${item.id}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function deleteBrainDump(id) {
+  data.brainDumps = data.brainDumps.filter(b => b.id !== id);
+  saveData();
+  renderBrainDumps();
+}
+
+// All Tasks Page
+function updateAllPage() {
+  renderMasterList();
+  updateWeekStats();
+  renderStaleAndHistory();
+}
+
+function renderMasterList() {
+  const container = document.getElementById('masterList');
+  const tasks = data.tasks.filter(t => t.list === 'master');
+  
+  if (!tasks.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">لیست اصلی خالیه</div></div>`;
+    return;
+  }
+  
+  const order = { high: 0, medium: 1, low: 2 };
+  tasks.sort((a, b) => (order[a.importance] || 1) - (order[b.importance] || 1));
+  
+  container.innerHTML = tasks.map(task => {
+    const importanceEmoji = task.importance === 'high' ? '🔴' : task.importance === 'low' ? '🟢' : '🟡';
+    return `
+      <div class="task ${task.completed ? 'done' : ''} importance-${task.importance || 'medium'}" onclick="editTask('${task.id}')">
+        <div class="task-check ${task.completed ? 'checked' : ''}" onclick="event.stopPropagation(); toggleTask('${task.id}')">${task.completed ? '✓' : ''}</div>
+        <div class="task-content">
+          <div class="task-title">${task.title}</div>
+          <div class="task-meta">
+            <span class="tag">${importanceEmoji}</span>
+            ${task.role ? `<span class="tag blue">${task.role}</span>` : ''}
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="task-btn" onclick="event.stopPropagation(); moveToToday('${task.id}')">📅</button>
+          <button class="task-btn" onclick="event.stopPropagation(); deleteTask('${task.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateWeekStats() {
+  const weekStart = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const weekTasks = data.tasks.filter(t => t.createdAt >= weekStart);
+  const doneTasks = weekTasks.filter(t => t.completed);
+  const uniqueDays = [...new Set(data.activeDates.filter(d => d >= weekStart))].length;
+  const percent = weekTasks.length ? Math.round(doneTasks.length / weekTasks.length * 100) : 0;
+  
+  document.getElementById('wkDone').textContent = toPersian(doneTasks.length);
+  document.getElementById('wkPlan').textContent = toPersian(weekTasks.length);
+  document.getElementById('wkDays').textContent = toPersian(uniqueDays);
+  document.getElementById('wkPercent').textContent = toPersian(percent) + '٪';
+}
+
+function renderStaleAndHistory() {
+  const weekStart = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const stale = data.tasks.filter(t => !t.completed && t.list === 'master' && t.createdAt < weekStart);
+  const container = document.getElementById('staleTasksList');
+  
+  if (!stale.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-text">کار کهنه‌ای نداری 👍</div></div>`;
+  } else {
+    container.innerHTML = stale.slice(0, 5).map(t => `
+      <div class="tiny-task">
+        <span class="tiny-task-text">${t.title}</span>
+        <button class="task-btn" onclick="deleteTask('${t.id}'); updateAllPage();">🗑️</button>
+      </div>
+    `).join('');
+  }
+  
+  renderReviewHistory();
+  setupObstacleChips();
+}
+
+function renderReviewHistory() {
+  const container = document.getElementById('reviewHistory');
+  const allReviews = [...data.dailyReviews, ...data.weeklyReviews]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+  
+  if (!allReviews.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-text">هنوز مروری نداری</div></div>`;
+    return;
+  }
+  
+  container.innerHTML = allReviews.map(r => `
+    <div class="review-card">
+      <h4>${r.date} ${r.experiment ? '(هفتگی)' : '(روزانه)'}</h4>
+      ${r.good ? `<p>✅ ${r.good}</p>` : ''}
+      ${r.better ? `<p>🤔 ${r.better}</p>` : ''}
+      ${r.tomorrow ? `<p>💡 ${r.tomorrow}</p>` : ''}
+      ${r.progress ? `<p>📈 ${r.progress}</p>` : ''}
+      ${r.experiment ? `<p>🧪 ${r.experiment}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function setupObstacleChips() {
+  document.querySelectorAll('#obstacleChips .chip').forEach(c => {
+    c.onclick = () => {
+      c.classList.toggle('selected');
+      const v = c.dataset.v;
+      if (c.classList.contains('selected')) {
+        if (!tempObstacles.includes(v)) tempObstacles.push(v);
+      } else {
+        const idx = tempObstacles.indexOf(v);
+        if (idx > -1) tempObstacles.splice(idx, 1);
+      }
+    };
+  });
+}
+
+function pruneOldTasks() {
+  const weekStart = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const before = data.tasks.length;
+  data.tasks = data.tasks.filter(t => t.completed || t.createdAt >= weekStart);
+  const after = data.tasks.length;
+  saveData();
+  updateAllPage();
+  showToast(`✅ ${toPersian(before - after)} کار پاک شد`);
+}
+
+function saveWeeklyReview() {
+  const progress = document.getElementById('weekProgress').value.trim();
+  const experiment = document.getElementById('weekExperiment').value.trim();
+  
+  if (!progress && !experiment && !tempObstacles.length) {
+    showToast('حداقل یه چیز بنویس!');
+    return;
+  }
+  
+  data.weeklyReviews.push({
+    date: getToday(),
+    progress,
+    obstacles: [...tempObstacles],
+    experiment,
+    createdAt: new Date().toISOString()
+  });
+  
+  document.getElementById('weekProgress').value = '';
+  document.getElementById('weekExperiment').value = '';
+  document.querySelectorAll('#obstacleChips .chip').forEach(c => c.classList.remove('selected'));
+  tempObstacles = [];
+  
+  saveData();
+  renderReviewHistory();
+  showToast('✅ مرور هفتگی ذخیره شد');
+}
+
+// Habits Page
+function updateHabitsPage() {
+  renderHabits();
+  renderIfThens();
+  renderWoops();
+  updateHabitTaskSelects();
+}
+
+function updateHabitTaskSelects() {
+  const todayTasks = data.tasks.filter(t => t.list === 'today' && t.date === getToday());
+  const options = '<option value="">انتخاب از کارهای امروز...</option>' + 
+    todayTasks.map(t => `<option value="${t.title}">${t.title}</option>`).join('');
+  
+  const hSelect = document.getElementById('habitTaskSelect');
+  const iSelect = document.getElementById('ifTaskSelect');
+  
+  if (hSelect) hSelect.innerHTML = options;
+  if (iSelect) iSelect.innerHTML = options;
+}
+
+function renderHabits() {
+  const container = document.getElementById('habitsList');
+  if (!data.habits.length) { container.innerHTML = ''; return; }
+  container.innerHTML = data.habits.map(h => `
+    <div class="tiny-task">
+      <span class="tiny-task-text">بعد از ${h.anchor} → ${h.behavior}</span>
+      <button class="task-btn" onclick="deleteHabit('${h.id}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function addHabit() {
+  const anchor = document.getElementById('habitAnchor').value.trim();
+  const behavior = document.getElementById('habitBehavior').value.trim();
+  if (!anchor || !behavior) return showToast('هر دو فیلد رو پر کن');
+  
+  data.habits.push({ id: Date.now().toString(), anchor, behavior });
+  saveData();
+  document.getElementById('habitAnchor').value = '';
+  document.getElementById('habitBehavior').value = '';
+  renderHabits();
+  showToast('✅ عادت اضافه شد');
+}
+
+function deleteHabit(id) {
+  data.habits = data.habits.filter(h => h.id !== id);
+  saveData();
+  renderHabits();
+}
+
+function renderIfThens() {
+  const container = document.getElementById('ifThenList');
+  if (!data.ifThens.length) { container.innerHTML = ''; return; }
+  container.innerHTML = data.ifThens.map(r => `
+    <div class="tiny-task">
+      <span class="tiny-task-text">اگر ${r.ifC} → ${r.thenA}</span>
+      <button class="task-btn" onclick="deleteIfThen('${r.id}')">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function addIfThen() {
+  const ifC = document.getElementById('ifCond').value.trim();
+  const thenA = document.getElementById('thenAct').value.trim();
+  if (!ifC || !thenA) return showToast('هر دو فیلد رو پر کن');
+  
+  data.ifThens.push({ id: Date.now().toString(), ifC, thenA });
+  saveData();
+  document.getElementById('ifCond').value = '';
+  document.getElementById('thenAct').value = '';
+  renderIfThens();
+  showToast('✅ قانون اضافه شد');
+}
+
+function deleteIfThen(id) {
+  data.ifThens = data.ifThens.filter(r => r.id !== id);
+  saveData();
+  renderIfThens();
+}
+
+function renderWoops() {
+  const container = document.getElementById('woopList');
+  if (!data.woops?.length) { container.innerHTML = ''; return; }
+  container.innerHTML = data.woops.map(w => `
+    <div class="card" style="padding: 12px; margin-bottom: 8px;">
+      <p style="font-size:0.85rem"><strong>🌟</strong> ${w.wish}</p>
+      <p style="font-size:0.85rem"><strong>✨</strong> ${w.outcome}</p>
+      <p style="font-size:0.85rem"><strong>🚧</strong> ${w.obstacle}</p>
+      <p style="font-size:0.85rem"><strong>📋</strong> ${w.plan}</p>
+      <button class="task-btn" onclick="deleteWoop('${w.id}')" style="margin-top: 6px;">🗑️</button>
+    </div>
+  `).join('');
+}
+
+function addWoop() {
+  const wish = document.getElementById('woopW').value.trim();
+  const outcome = document.getElementById('woopO').value.trim();
+  const obstacle = document.getElementById('woopOb').value.trim();
+  const plan = document.getElementById('woopP').value.trim();
+  
+  if (!wish || !plan) return showToast('آرزو و برنامه رو حداقل بنویس');
+  
+  if (!data.woops) data.woops = [];
+  data.woops.push({ id: Date.now().toString(), wish, outcome, obstacle, plan });
+  saveData();
+  ['woopW', 'woopO', 'woopOb', 'woopP'].forEach(id => document.getElementById(id).value = '');
+  renderWoops();
+  showToast('✅ هدف WOOP اضافه شد');
+}
+
+function deleteWoop(id) {
+  data.woops = data.woops.filter(w => w.id !== id);
+  saveData();
+  renderWoops();
+}
+
+// Projects
+function updateProjectsPage() {
+  renderProjects();
+}
+
+function addProject() {
+  const name = document.getElementById('projectName').value.trim();
+  const goal = document.getElementById('projectGoal').value.trim();
+  const deadline = document.getElementById('projectDeadline').value;
+  
+  if (!name) return showToast('نام پروژه رو بنویس');
+  
+  if (!data.projects) data.projects = [];
+  data.projects.push({
+    id: Date.now().toString(),
+    name,
+    goal,
+    deadline,
+    tasks: [],
+    createdAt: new Date().toISOString()
+  });
+  
+  saveData();
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectGoal').value = '';
+  document.getElementById('projectDeadline').value = '';
+  renderProjects();
+  showToast('✅ پروژه اضافه شد');
+}
+
+function renderProjects() {
+  const container = document.getElementById('projectsList');
+  if (!data.projects?.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-text">هنوز پروژه‌ای نداری</div></div>`;
+    return;
+  }
+  
+  container.innerHTML = data.projects.map(p => {
+    const projectTasks = data.tasks.filter(t => t.projectId === p.id);
+    const taskCount = projectTasks.length;
+    const doneCount = projectTasks.filter(t => t.completed).length;
+    
+    const taskListHtml = projectTasks.length > 0 ? 
+      `<div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border);">
+         ${projectTasks.map(t => `
+           <div class="tiny-task" onclick="editTask('${t.id}')">
+             <span class="tiny-task-text ${t.completed ? 'text-muted' : ''}" style="${t.completed ? 'text-decoration:line-through' : ''}">${t.title}</span>
+             <span class="tag ${t.completed ? 'green' : 'gray'}">${t.completed ? '✓' : '○'}</span>
+           </div>
+         `).join('')}
+       </div>` : '';
+
+    return `
+      <div class="card" style="padding: 16px; margin-bottom: 12px;">
+        <div class="flex items-center gap-2 mb-2">
+          <span style="font-size: 1.4rem;">🎯</span>
+          <strong style="font-size: 1.1rem;">${p.name}</strong>
+        </div>
+        ${p.goal ? `<p style="font-size: 0.9rem; color: var(--text2); margin-bottom: 8px;">${p.goal}</p>` : ''}
+        
+        <div class="flex gap-2 mb-3">
+          ${p.deadline ? `<span class="tag">📅 ${p.deadline}</span>` : ''}
+          <span class="tag blue">پیشرفت: ${toPersian(doneCount)}/${toPersian(taskCount)}</span>
+        </div>
+
+        ${taskListHtml}
+
+        <div class="flex gap-2 mt-3 pt-2 border-top">
+          <button class="btn btn-sm btn-light flex-1" onclick="addTaskToProject('${p.id}')">+ افزودن کار جدید</button>
+          <button class="btn btn-sm btn-outline" onclick="deleteProject('${p.id}')" style="width: auto;">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function addTaskToProject(projectId) {
+  document.getElementById('taskList').value = 'master';
+  showTaskModal('master');
+  // ذخیره projectId برای استفاده در saveTask
+  document.getElementById('editTaskId').dataset.projectId = projectId;
+}
+
+function deleteProject(id) {
+  if (!confirm('پروژه و کارهایش حذف بشه؟')) return;
+  data.projects = data.projects.filter(p => p.id !== id);
+  data.tasks = data.tasks.filter(t => t.projectId !== id);
+  saveData();
+  renderProjects();
+}
+
+// AI Page
+function generatePrompt() {
+  const weekStart = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+  const weekTasks = data.tasks.filter(t => t.createdAt >= weekStart);
+  const doneTasks = weekTasks.filter(t => t.completed);
+  const percent = weekTasks.length ? Math.round(doneTasks.length / weekTasks.length * 100) : 0;
+  
+  const prompt = `You are a productivity coach. Analyze this user's data and provide personalized advice in Persian (Farsi).
+
+## پروفایل کاربر
+- اسم: ${data.user.name || 'کاربر'}
+- ارزش‌ها: ${data.user.values.join('، ') || 'نامشخص'}
+- نقش‌ها: ${data.user.roles.join('، ') || 'نامشخص'}
+- زمان انرژی: ${data.user.energy === 'morning' ? 'صبح' : data.user.energy === 'evening' ? 'شب' : 'بعدازظهر'}
+- جمله هویتی: ${data.user.identity || 'نامشخص'}
+
+## آمار هفته
+- کارهای برنامه‌ریزی شده: ${weekTasks.length}
+- کارهای انجام شده: ${doneTasks.length}
+- درصد موفقیت: ${percent}%
+- روزهای فعال: ${data.activeDates.filter(d => d >= weekStart).length}/7
+- استریک فعلی: ${data.streak} روز
+
+## کارهای انجام شده
+${doneTasks.map(t => `- ${t.title} [اهمیت: ${t.importance || 'متوسط'}]`).join('\n') || 'هیچ'}
+
+## کارهای انجام نشده
+${weekTasks.filter(t => !t.completed).map(t => `- ${t.title} [اهمیت: ${t.importance || 'متوسط'}]`).join('\n') || 'هیچ'}
+
+## عادت‌های کوچک
+${data.habits.map(h => `- بعد از "${h.anchor}" → "${h.behavior}"`).join('\n') || 'تعریف نشده'}
+
+## قوانین اگر-آنگاه
+${data.ifThens.map(r => `- اگر "${r.ifC}" → "${r.thenA}"`).join('\n') || 'تعریف نشده'}
+
+## اهداف WOOP
+${data.woops?.map(w => `- آرزو: ${w.wish}، مانع: ${w.obstacle}، برنامه: ${w.plan}`).join('\n') || 'تعریف نشده'}
+
+## مرورهای روزانه اخیر
+${data.dailyReviews.slice(-3).map(r => `- ${r.date}: خوب: "${r.good}"، بهتر: "${r.better}"`).join('\n') || 'هیچ'}
+
+---
+
+لطفاً به فارسی پاسخ بده:
+1. **تحلیل کلی**: وضعیت فعلی کاربر
+2. **نقاط قوت**: چه چیزهایی خوب پیش رفته
+3. **پیشنهادات**: ۳ پیشنهاد مشخص برای هفته آینده
+4. **عادت جدید**: یک Tiny Habit پیشنهادی
+5. **قانون If-Then**: یک قانون برای مقابله با موانع
+
+لحن گرم، حمایتی و ضدکمال‌گرایی داشته باش. بر قدم‌های کوچک تأکید کن.`;
+
+  document.getElementById('promptBox').textContent = prompt;
+  document.getElementById('promptBox').classList.remove('hidden');
+  document.getElementById('copyPromptBtn').classList.remove('hidden');
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('promptBox').textContent)
+    .then(() => showToast('✅ پرامپت کپی شد'))
+    .catch(() => showToast('❌ خطا در کپی'));
+}
+
+function copyQuestion(el) {
+  navigator.clipboard.writeText(el.querySelector('.tiny-task-text').textContent)
+    .then(() => showToast('✅ سوال کپی شد'))
+    .catch(() => showToast('❌ خطا در کپی'));
+}
+
+// Settings Page
+function updateSettingsPage() {
+  document.getElementById('setName').value = data.user.name || '';
+  document.getElementById('setIdentity').value = data.user.identity || '';
+  
+  document.getElementById('settingsValues').innerHTML = data.user.values.map(v => 
+    `<span class="chip selected" onclick="removeValue('${v}')">${v} ✕</span>`
+  ).join('');
+  
+  document.getElementById('settingsRoles').innerHTML = data.user.roles.map(r => 
+    `<span class="chip selected" onclick="removeRole('${r}')">${r} ✕</span>`
+  ).join('');
+}
+
+function addSettingValue() {
+  const input = document.getElementById('addValueInput');
+  const v = input.value.trim();
+  if (!v || data.user.values.includes(v)) return;
+  data.user.values.push(v);
+  input.value = '';
+  saveData();
+  updateSettingsPage();
+}
+
+function removeValue(v) {
+  data.user.values = data.user.values.filter(x => x !== v);
+  saveData();
+  updateSettingsPage();
+}
+
+function addSettingRole() {
+  const input = document.getElementById('addRoleInput');
+  const r = input.value.trim();
+  if (!r || data.user.roles.includes(r)) return;
+  data.user.roles.push(r);
+  input.value = '';
+  saveData();
+  updateSettingsPage();
+}
+
+function removeRole(r) {
+  data.user.roles = data.user.roles.filter(x => x !== r);
+  saveData();
+  updateSettingsPage();
+}
+
+function saveSettings() {
+  data.user.name = document.getElementById('setName').value.trim();
+  data.user.identity = document.getElementById('setIdentity').value;
+  saveData();
+  showToast('✅ ذخیره شد');
+  updateTodayPage();
+}
+
+function doResetSetup() {
+  if (confirm('آنبوردینگ از اول شروع بشه؟')) {
+    data.setupDone = false;
+    saveData();
+    location.reload();
+  }
+}
+
+function doClearAll() {
+  if (confirm('مطمئنی همه داده‌ها پاک بشن؟')) {
+    if (confirm('آخرین تأیید: واقعاً پاک بشن؟')) {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  }
+}
+
+// Init
+function init() {
+  loadData();
+  applyTheme();
+  
+  document.querySelectorAll('#valuesChips .chip').forEach(c => {
+    c.addEventListener('click', () => toggleChip(c, tempValues));
+  });
+  
+  document.querySelectorAll('#rolesChips .chip').forEach(c => {
+    c.addEventListener('click', () => toggleChip(c, tempRoles));
+  });
+  
+  document.querySelectorAll('#energyChips .chip').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('#energyChips .chip').forEach(x => x.classList.remove('selected'));
+      c.classList.add('selected');
+      data.user.energy = c.dataset.v;
+    });
+  });
+  
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.addEventListener('click', () => goToPage(n.dataset.page));
+  });
+  
+  setInterval(saveData, 30000);
+  window.addEventListener('beforeunload', saveData);
+  window.addEventListener('pagehide', saveData);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') saveData();
+  });
+  
+  if (data.setupDone) {
+    showMainApp();
+  }
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(`
+    const CACHE = 'todo-formula-v3';
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+    self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request))));
+  `)).catch(() => {});
+}
+
+init();
+</script>
+</body>
+</html>
